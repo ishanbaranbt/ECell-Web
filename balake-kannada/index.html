@@ -1,0 +1,1218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>baLake kannaDa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Daily practice for everyday spoken Kannada, written in English letters.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+/* Layout: one 760px working column — streak console on top, a numbered unit track below; sessions take over the column. */
+:root {
+  --bg: #090a12;
+  --panel: #10121d;
+  --panel-2: #161a29;
+  --line: #262b42;
+  --fg: #e4e6f1;
+  --muted: #868ca8;
+  --cyan: #29e0e6;
+  --cyan-dim: rgba(41, 224, 230, .12);
+  --pink: #ff3d8b;
+  --yellow: #f4e45e;
+  --ok: #3cf29a;
+  --ok-dim: rgba(60, 242, 154, .12);
+  --bad: #ff4f63;
+  --bad-dim: rgba(255, 79, 99, .12);
+  --ink-on-accent: #05060b;
+  --f-display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --cut: 10px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  background-image:
+    linear-gradient(rgba(41, 224, 230, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(41, 224, 230, .035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  color: var(--fg);
+  font: 15px/1.55 var(--f-body);
+  min-height: 100vh;
+}
+[hidden] { display: none !important; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Kannada text: mono so capitals read clearly; stressed (capital) letters glow pink */
+.kn { font-family: var(--f-mono); font-weight: 600; letter-spacing: .01em; }
+.kn b.hs { color: var(--pink); font-weight: 700; text-shadow: 0 0 10px rgba(255, 61, 139, .45); }
+
+/* ---------- top bar ---------- */
+.top {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: rgba(9, 10, 18, .92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.top .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; flex-wrap: wrap; }
+.brand { font-family: var(--f-mono); font-weight: 700; font-size: 18px; letter-spacing: .02em; margin-right: auto; white-space: nowrap; }
+.brand .kn { font-weight: 700; }
+.brand small { display: block; font: 500 10px/1.2 var(--f-display); letter-spacing: .22em; color: var(--muted); text-transform: uppercase; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 700 15px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.chip svg { width: 18px; height: 18px; }
+.chip.streak { color: var(--yellow); }
+.chip.streak.cold { color: var(--muted); }
+.chip.xp { color: var(--cyan); }
+nav.tabs { display: flex; gap: 4px; }
+nav.tabs button {
+  background: none; border: 0; padding: 6px 10px;
+  font: 600 12px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  border-bottom: 2px solid transparent;
+}
+nav.tabs button[aria-current="page"] { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+main { padding-block: 24px 64px; }
+.view { display: grid; gap: 24px; }
+
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: 26px; font-weight: 700; }
+h2 { font-size: 20px; font-weight: 600; }
+h3 { font-size: 15px; font-weight: 600; }
+.label { font: 600 11px/1.3 var(--f-display); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+p { margin: 0; }
+
+/* cut-corner panels & buttons */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  padding: 20px;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1px solid var(--cyan); background: var(--cyan); color: var(--ink-on-accent);
+  font: 700 13px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase;
+  padding: 13px 22px;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
+  transition: filter .15s, transform .1s;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.12); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { background: var(--panel-2); border-color: var(--line); color: var(--muted); cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--cyan); }
+.btn.ghost:disabled { background: transparent; }
+.btn.small { padding: 9px 14px; font-size: 11px; }
+.btn.danger { border-color: var(--bad); color: var(--bad); background: transparent; }
+.btn.okb { background: var(--ok); border-color: var(--ok); }
+.btn.badb { background: var(--bad); border-color: var(--bad); }
+
+/* ---------- streak console ---------- */
+.console { display: grid; grid-template-columns: auto 1fr; gap: 20px 28px; align-items: center; }
+.big-streak { display: flex; align-items: center; gap: 12px; }
+.big-streak svg { width: 46px; height: 46px; color: var(--yellow); filter: drop-shadow(0 0 10px rgba(244, 228, 94, .5)); }
+.big-streak.cold svg { color: var(--muted); filter: none; }
+.big-streak .n { font: 700 46px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.big-streak .u { font: 600 12px/1.2 var(--f-display); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.console-msg { font-size: 15px; }
+.console-msg strong { color: var(--yellow); font-weight: 600; }
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; grid-column: 1 / -1; }
+.day { display: grid; gap: 4px; justify-items: center; }
+.day .sq {
+  width: 100%; aspect-ratio: 1; max-width: 44px;
+  border: 1px solid var(--line); background: var(--panel-2);
+  display: grid; place-items: center;
+}
+.day.met .sq { background: var(--yellow); border-color: var(--yellow); color: var(--ink-on-accent); box-shadow: 0 0 12px rgba(244, 228, 94, .35); }
+.day.today .sq { border-color: var(--cyan); }
+.day .sq svg { width: 55%; height: 55%; }
+.day .d { font: 600 10px/1 var(--f-display); letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+.goalrow { grid-column: 1 / -1; display: grid; gap: 8px; }
+.goalrow .top-line { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.meter { height: 8px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); transition: width .5s ease; }
+.goal-select { display: inline-flex; gap: 8px; align-items: center; }
+select {
+  background: var(--panel-2); border: 1px solid var(--line); padding: 5px 8px;
+  font: 600 12px/1 var(--f-display); letter-spacing: .06em;
+}
+.stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
+.stat .v { font: 700 20px/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
+
+/* ---------- unit track ---------- */
+.track-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.track { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; position: relative; }
+.track::before { content: ""; position: absolute; left: 27px; top: 28px; bottom: 28px; width: 2px; background: var(--line); }
+.unit-row {
+  position: relative; display: grid; grid-template-columns: 56px 1fr auto; gap: 16px; align-items: center;
+  padding: 12px 0; background: none; border: 0; text-align: left; width: 100%;
+}
+.unit-row .node {
+  width: 56px; height: 56px; display: grid; place-items: center;
+  background: var(--panel); border: 2px solid var(--line);
+  font: 700 16px/1 var(--f-display); color: var(--muted);
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+  z-index: 1;
+}
+.unit-row.started .node { border-color: var(--cyan); color: var(--cyan); }
+.unit-row.done .node { background: var(--cyan); border-color: var(--cyan); color: var(--ink-on-accent); }
+.unit-row.next .node { border-color: var(--yellow); color: var(--yellow); box-shadow: 0 0 0 3px rgba(244, 228, 94, .15); }
+.unit-row .info { min-width: 0; display: grid; gap: 3px; }
+.unit-row .ttl { font: 600 17px/1.25 var(--f-display); }
+.unit-row .sub { font-size: 13px; color: var(--muted); }
+.unit-row:hover .ttl { color: var(--cyan); }
+.pips { display: flex; gap: 4px; }
+.pips i { width: 18px; height: 6px; background: var(--panel-2); border: 1px solid var(--line); }
+.pips i.on { background: var(--cyan); border-color: var(--cyan); }
+.tag-next { font: 700 10px/1 var(--f-display); letter-spacing: .18em; color: var(--yellow); text-transform: uppercase; }
+
+/* ---------- unit detail ---------- */
+.back { background: none; border: 0; padding: 0; color: var(--muted); font: 600 12px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; justify-self: start; }
+.back:hover { color: var(--cyan); }
+.unit-head { display: grid; gap: 8px; }
+.unit-head p { max-width: 62ch; }
+.notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.notes li { padding-left: 16px; position: relative; max-width: 65ch; }
+.notes li::before { content: ""; position: absolute; left: 0; top: .65em; width: 7px; height: 2px; background: var(--cyan); }
+.vocab { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.vocab div { background: var(--panel); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.vocab .kn { font-size: 15px; overflow-wrap: anywhere; }
+.vocab .en { font-size: 13px; color: var(--muted); }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- session ---------- */
+.session { display: grid; gap: 22px; }
+.s-top { display: flex; align-items: center; gap: 14px; }
+.quit { background: none; border: 0; color: var(--muted); padding: 4px; display: grid; place-items: center; }
+.quit svg { width: 22px; height: 22px; }
+.quit:hover { color: var(--bad); }
+.s-top .meter { flex: 1; height: 10px; }
+.s-count { font: 600 13px/1 var(--f-display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.q-kind { color: var(--cyan); }
+.prompt { font: 600 22px/1.35 var(--f-display); }
+.prompt .kn { font-size: 24px; }
+.hint { color: var(--muted); font-size: 14px; }
+.sentence { font-size: 22px; line-height: 1.6; }
+.blank { display: inline-block; min-width: 90px; border-bottom: 2px dashed var(--cyan); color: var(--cyan); text-align: center; padding: 0 6px; }
+
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.opt {
+  display: flex; align-items: center; gap: 12px; text-align: left;
+  background: var(--panel); border: 1px solid var(--line); padding: 14px 16px; min-height: 56px;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+.opt .k { font: 600 11px/1 var(--f-mono); color: var(--muted); border: 1px solid var(--line); padding: 3px 6px; }
+.opt .t { font-size: 17px; min-width: 0; overflow-wrap: anywhere; }
+.opt:hover:not(:disabled) { border-color: var(--cyan); }
+.opt.sel { border-color: var(--cyan); background: var(--cyan-dim); }
+.opt.sel .k { border-color: var(--cyan); color: var(--cyan); }
+.opt.right { border-color: var(--ok); background: var(--ok-dim); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-dim); }
+.opt:disabled { cursor: default; }
+
+.slots, .bank { display: flex; flex-wrap: wrap; gap: 8px; min-height: 58px; align-content: flex-start; }
+.slots { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.bank { padding-top: 4px; }
+.tile {
+  background: var(--panel-2); border: 1px solid var(--line); padding: 9px 13px; font-size: 16px;
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%);
+}
+.tile:hover:not(:disabled) { border-color: var(--cyan); }
+.tile.ghosted { visibility: hidden; }
+.tile:disabled { cursor: default; }
+
+.type-in { display: grid; gap: 10px; }
+.model { font-size: 15px; }
+.model .arrow { color: var(--cyan); margin: 0 8px; }
+input[type="text"], input[type="search"] {
+  width: 100%; background: var(--panel); border: 1px solid var(--line); padding: 14px 16px;
+  font: 600 18px/1.2 var(--f-mono);
+}
+input[type="text"]:focus, input[type="search"]:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px var(--cyan-dim); }
+
+.match { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.match .col { display: grid; gap: 8px; align-content: start; }
+.match .opt { min-height: 50px; padding: 10px 12px; }
+.match .opt.done { border-color: var(--ok); background: var(--ok-dim); opacity: .55; }
+
+.feedback {
+  position: sticky; bottom: 0;
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: var(--bg); border-top: 1px solid var(--line);
+  display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+}
+.feedback.ok { background: #0c1f19; border-top-color: var(--ok); }
+.feedback.bad { background: #22101a; border-top-color: var(--bad); }
+.fb-text { display: grid; gap: 4px; min-width: 0; flex: 1 1 260px; }
+.fb-title { font: 700 17px/1.2 var(--f-display); }
+.feedback.ok .fb-title { color: var(--ok); }
+.feedback.bad .fb-title { color: var(--bad); }
+.fb-ans { font-size: 15px; overflow-wrap: anywhere; }
+.fb-actions { display: flex; gap: 10px; align-items: center; }
+
+/* results */
+.result { display: grid; gap: 22px; justify-items: start; }
+.result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; }
+.result-grid .panel { padding: 16px; }
+.result-grid .v { font: 700 28px/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
+.streak-up { display: flex; align-items: center; gap: 14px; }
+.streak-up svg { width: 40px; height: 40px; color: var(--yellow); filter: drop-shadow(0 0 10px rgba(244, 228, 94, .55)); }
+@keyframes pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
+.streak-up.anim svg { animation: pop .6s ease-out both; }
+
+/* words + guide */
+.searchbar { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 62px); z-index: 5; background: var(--bg); padding-block: 4px 8px; }
+.word-group { display: grid; gap: 10px; }
+.word-list { display: grid; border: 1px solid var(--line); }
+.word-list div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 12px; padding: 9px 14px; border-top: 1px solid var(--line); background: var(--panel); }
+.word-list div:first-child { border-top: 0; }
+.word-list .en { color: var(--muted); }
+.empty { color: var(--muted); padding: 20px 0; }
+.key-table { width: 100%; border-collapse: collapse; }
+.key-table th, .key-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.key-table th { font: 600 11px/1.3 var(--f-display); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.table-scroll { overflow-x: auto; }
+.prose { display: grid; gap: 12px; max-width: 65ch; }
+.reset-zone { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+@media (max-width: 560px) {
+  .console { grid-template-columns: 1fr; }
+  .top .wrap { gap: 10px; }
+  nav.tabs { order: 3; width: 100%; justify-content: space-between; }
+  .prompt { font-size: 19px; }
+  .sentence { font-size: 19px; }
+  .result-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .searchbar { top: calc(env(safe-area-inset-top, 0px) + 96px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-flame" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 1.5c.4 3.1-1 5-2.6 6.8C9.3 10.1 7.5 12 7.5 15a4.5 4.5 0 0 0 9 0c0-1.6-.6-2.9-1.4-4 .1 1.3-.3 2.4-1.3 3 .4-2.4-.4-4.6-1.8-6.4 2.9 1 6 4 6 8.4A8 8 0 0 1 2 16c0-4.5 2.6-7 4.9-9.3 2-2 3.9-3.5 6.6-5.2Z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" d="M5 5l14 14M19 5 5 19"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" d="m4 12 5 5L20 6"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="kn" id="brandName"></span><small>Everyday spoken Kannada</small></div>
+    <span class="chip streak" id="chipStreak" title="Day streak"><svg><use href="#i-flame"/></svg><span id="chipStreakN">0</span></span>
+    <span class="chip xp" title="XP today / daily goal"><svg><use href="#i-bolt"/></svg><span id="chipXp">0/20</span></span>
+    <nav class="tabs" id="tabs">
+      <button data-tab="learn" aria-current="page">Learn</button>
+      <button data-tab="words">Words</button>
+      <button data-tab="guide">Sound key</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+(function () {
+"use strict";
+
+/* =====================================================================
+   COURSE CONTENT — taken from the baLake kannaDa exercise sheets
+   (Lessons 1–10). Notation: doubled vowel = long vowel (aa, ii, uu, ee, oo);
+   CAPITAL letter = the hard, stressed sound (tongue curled back): T D N L Sh.
+   The first letter of a word is never capitalised for its own sake.
+   ===================================================================== */
+var UNITS = [
+{
+  id: "u1", ref: "Lesson 1", title: "Who & what",
+  blurb: "Introduce yourself, point at people and things, and ask who or what.",
+  notes: [
+    "niinu is “you” for friends and younger people; niivu is the respectful “you”. Use niivu with elders and strangers.",
+    "Possession changes the word: naanu → nanna (my), niivu → nimma (your), avaru → avara (their), adu → adara (its), avu → avugaLa (of those).",
+    "Make a yes/no question by adding -aa: mane → maneenaa? (a house?), avaLu → avaLaa? (her?), kaaleeju → kaaleejaa? (the college?)."
+  ],
+  vocab: [
+    ["naanu","I"],["niinu","you (informal)"],["niivu","you (respectful)"],["avanu","he (that man)"],
+    ["avaLu","she (that woman)"],["avaru","they / he, she (respectful)"],["ivanu","he (this man)"],["ivaLu","she (this woman)"],
+    ["ivaru","this person (respectful)"],["adu","that / it"],["idu","this"],["avu","those"],
+    ["nanna","my"],["nimma","your (respectful)"],["ninna","your (informal)"],["namma","our"],
+    ["yaaru","who"],["eenu","what"],["yaava","which"],["uuru","town / hometown"],
+    ["hesaru","name"],["huDuga","boy"],["huDugi","girl"],["kaaleeju","college"],
+    ["adhyaapaka","teacher (male)"],["tande","father"],["taayi","mother"],["akka","elder sister"],
+    ["aNNa","elder brother"],["sneehita","friend (male)"],["sneehite","friend (female)"],["vidyaarthi","student (male)"],
+    ["vidyaarthini","student (female)"],["maatrubhaaShe","mother tongue"],["mane","house"],["naayi","dog"],
+    ["pustaka","book"],["pennu","pen"],["uuTa","meal"]
+  ],
+  items: [
+    {t:"fill", s:"___ yaava uuru?", en:"Which is your hometown?", a:"nimma", o:["niinu","nimma","naanu"]},
+    {t:"fill", s:"___ yaaru?", en:"Who are you? (respectful)", a:"niivu", o:["niivu","nimma","nanna"]},
+    {t:"fill", s:"___ huDugi.", en:"She is a girl.", a:"avaLu", o:["avanu","avaLu","adu"]},
+    {t:"fill", s:"adu namma ___.", en:"That is our college.", a:"kaaleeju", o:["adhyaapaka","kaaleeju","akka"]},
+    {t:"fill", s:"ivanu namma ___.", en:"He is our elder brother.", a:"aNNa", o:["akka","aNNa","taayi"]},
+    {t:"fill", s:"nimma hesaru ___?", en:"What is your name?", a:"eenu", o:["yaaru","eenu","yaava"]},
+    {t:"fill", s:"ivaru ___ tande.", en:"He is my father.", a:"nanna", o:["nanna","naanu","idu"]},
+    {t:"fill", s:"ivaLu ___ akka.", en:"She is our elder sister.", a:"namma", o:["namma","naanu","yaaru"]},
+    {t:"type", q:"mane", a:["maneenaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"huDugi", a:["huDuginaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"avaLu", a:["avaLaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"kaaleeju", a:["kaaleejaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"uuTa", a:["uuTaanaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"naanu", a:["nanna"], rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"type", q:"avaru", a:["avara"], rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"type", q:"adu", a:["adara"], rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"type", q:"avu", a:["avugaLa"], rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"build", kn:"nimma hesaru eenu?", en:"What is your name?"},
+    {t:"build", kn:"ivaru nanna tande.", en:"He is my father."},
+    {t:"build", kn:"adu namma kaaleeju.", en:"That is our college."}
+  ]
+},
+{
+  id: "u2", ref: "Lesson 2", title: "Questions & family",
+  blurb: "Ask where, whose and how much, and talk about brothers, sisters and friends.",
+  notes: [
+    "aNNa / akka are elder brother / elder sister; tamma / tangi are younger brother / younger sister. Kannada always marks elder or younger.",
+    "ide means “is (there)” for things and places: nimma mane elli ide? — Where is your house?",
+    "nimma uuTa aaytaa? (Have you eaten?) is an everyday greeting, not only a question about food."
+  ],
+  vocab: [
+    ["elli","where"],["eShTu","how much / how many"],["yaara","whose"],["magu","child"],
+    ["makkaLu","children"],["naaTaka","drama / play"],["paaTa","lesson"],["tamma","younger brother"],
+    ["tangi","younger sister"],["hattira","near"],["kaShTa","difficult"],["nagara","city"],
+    ["sundara","beautiful"],["ide","is (there)"],["aaytaa?","is it done? / did it happen?"]
+  ],
+  items: [
+    {t:"fill", s:"adu ___ pustaka.", en:"That is my book.", a:"nanna", o:["nanna","naanu","elli"]},
+    {t:"fill", s:"raamanu avana ___.", en:"Raama is his friend.", a:"sneehita", o:["sneehita","huDugi","taayi"]},
+    {t:"fill", s:"ivaru ___ tande.", en:"He is our father.", a:"namma", o:["namma","avaLu","yaaru"]},
+    {t:"fill", s:"ivaLu ___ akka.", en:"She is your elder sister.", a:"nimma", o:["nimma","niivu","adu"]},
+    {t:"fill", s:"avanu ninna ___.", en:"He is your younger brother.", a:"tamma", o:["tamma","tangi","akka"]},
+    {t:"fill", s:"adu yaara ___?", en:"Whose house is that?", a:"mane", o:["mane","elli","eShTu"]},
+    {t:"fill", s:"nimma mane ___ ide?", en:"Where is your house?", a:"elli", o:["elli","yaaru","eenu"]},
+    {t:"build", kn:"krishna yaaru?", en:"Who is Krishna?"},
+    {t:"build", kn:"idu nimma kaaleejaa?", en:"Is this your college?"},
+    {t:"build", kn:"avanu yaaru?", en:"Who is he?"},
+    {t:"build", kn:"adu eenu?", en:"What is that?"},
+    {t:"build", kn:"nimma mane elli ide?", en:"Where is your house?"},
+    {t:"build", kn:"idu yaaru?", en:"Who is this?"},
+    {t:"build", kn:"nimma uuTa aaytaa?", en:"Have you had your meal?"},
+    {t:"build", kn:"bengaLuuru sundara nagara.", en:"Bengaluru is a beautiful city."}
+  ]
+},
+{
+  id: "u3", ref: "Lesson 3", title: "Describing things",
+  blurb: "Good and bad, new and old, big and small — plus the opposites you use every day.",
+  notes: [
+    "Adjectives come before the noun, as in English: oLLeya huDuga (a good boy), hosa pustaka (a new book).",
+    "Most negatives are made by changing the ending: gottu → gottilla (know → don't know), cennaagide → cennaagilla (it's good → it's not good).",
+    "beeku (want, need) and beeDa (don't want) are some of the most useful words you will learn."
+  ],
+  vocab: [
+    ["oLLeya","good"],["keTTa","bad"],["hosa","new"],["haLeya","old"],
+    ["doDDa","big"],["cikka","small"],["baNNa","colour"],["hasiru","green"],
+    ["mara","tree"],["ondu","one / a"],["jana","people (when counting)"],["iddaare","are there (people)"],
+    ["paTTaNa","town / city"],["kaaru","car"],["cennaagide","it is good"],["cennaagilla","it is not good"],
+    ["beeku","want / need"],["beeDa","don't want"],["gottu","know"],["gottilla","don't know"],
+    ["saaku","enough"],["saalalla","not enough"],["iShTa","like"],["iShTa illa","don't like"],
+    ["munde","in front"],["hinde","behind"],["meele","above / up"],["keLage","below / down"],
+    ["oLage","inside"],["horage","outside"],["bala","right"],["eDa","left"],
+    ["duura","far"],["swalpa","a little"],["jaasti","a lot / more"],["baa","come"],["hoogu","go"]
+  ],
+  items: [
+    {t:"fill", s:"avaLu ___ huDugi.", en:"She is a good girl.", a:"oLLeya", o:["oLLeya","keTTa","duura"]},
+    {t:"fill", s:"naanu ___ pustakavannu tande.", en:"I brought a new book.", a:"hosa", o:["hosa","haLeya","hinde"]},
+    {t:"fill", s:"bengaLuuru ___ paTTaNa.", en:"Bengaluru is a big city.", a:"doDDa", o:["doDDa","cikka","swalpa"]},
+    {t:"fill", s:"adu avana ___ kaaru.", en:"That is his old car.", a:"haLeya", o:["hosa","haLeya","oLage"]},
+    {t:"pair", kind:"opp", a:"cennaagide", b:"cennaagilla"},
+    {t:"pair", kind:"opp", a:"beeku", b:"beeDa"},
+    {t:"pair", kind:"opp", a:"gottu", b:"gottilla"},
+    {t:"pair", kind:"opp", a:"saaku", b:"saalalla"},
+    {t:"pair", kind:"opp", a:"iShTa", b:"iShTa illa"},
+    {t:"pair", kind:"opp", a:"doDDa", b:"cikka"},
+    {t:"pair", kind:"opp", a:"munde", b:"hinde"},
+    {t:"pair", kind:"opp", a:"meele", b:"keLage"},
+    {t:"pair", kind:"opp", a:"oLage", b:"horage"},
+    {t:"pair", kind:"opp", a:"oLLeya", b:"keTTa"},
+    {t:"pair", kind:"opp", a:"hosa", b:"haLeya"},
+    {t:"pair", kind:"opp", a:"bala", b:"eDa"},
+    {t:"pair", kind:"opp", a:"hattira", b:"duura"},
+    {t:"pair", kind:"opp", a:"swalpa", b:"jaasti"},
+    {t:"pair", kind:"opp", a:"baa", b:"hoogu"},
+    {t:"build", kn:"ondu hasiru mara.", en:"A green tree."},
+    {t:"build", kn:"alli eShTu jana huDugaru iddaare?", en:"How many boys are there?"}
+  ]
+},
+{
+  id: "u4", ref: "Lessons 4 & 5", title: "Places & time",
+  blurb: "Find a room, say where things are, and talk about today, tomorrow and yesterday.",
+  notes: [
+    "-alli means “in / at”: mane → maneyalli (at home), uuru → uuralli (in town), bengaLuuru → bengaLuuralli.",
+    "-ige / -ge / -akke means “to / for”: mane → manege (to the house), kelasa → kelasakke (to work), avaru → avarige (to them).",
+    "-adu turns a describing word into “the … one”: doDDa → doDDadu (the big one), nimma → nimmadu (yours)."
+  ],
+  vocab: [
+    ["illi","here"],["alli","there"],["ruumu","room"],["baaDigege","for rent"],
+    ["nanage","for me / to me"],["angaDi","shop"],["ivattu","today"],["naaLe","tomorrow"],
+    ["nenne","yesterday"],["soomavaara","Monday"],["mangaLavaara","Tuesday"],["raje","holiday"],
+    ["gaNita","mathematics"],["kelasa","work"],["hoTel","hotel / restaurant"],["nimage","to you / for you"],
+    ["namage","to us / for us"],["doDDadu","the big one"],["cikkadu","the small one"],["nimmadu","yours"]
+  ],
+  items: [
+    {t:"fill", s:"ruumu ___ ide?", en:"Where is the room?", a:"elli", o:["elli","alli","yaara"]},
+    {t:"fill", s:"illi yaavudaadaru ruumu ___ ideyaa?", en:"Is there any room for rent here?", a:"baaDigege", o:["baaDigege","nenne","cikkadu"]},
+    {t:"fill", s:"___ mane ideyaa?", en:"Is there a house there?", a:"alli", o:["alli","nanage","ivattu"]},
+    {t:"fill", s:"namma kaaleejina ___ metro steeshan ide.", en:"There is a metro station near our college.", a:"hattira", o:["hattira","elli","naaLe"]},
+    {t:"fill", s:"adu ___ gaNita pustaka?", en:"Whose maths book is that?", a:"yaara", o:["yaara","yaaru","eShTu"]},
+    {t:"fill", s:"namma angaDi ___.", en:"Our shop is small.", a:"cikkadu", o:["cikkadu","doDDa","duura"]},
+    {t:"fill", s:"___ mangaLavaara.", en:"Today is Tuesday.", a:"ivattu", o:["ivattu","nenne","illi"]},
+    {t:"fill", s:"ivattu soomavaara. ___ mangaLavaara.", en:"Today is Monday. Tomorrow is Tuesday.", a:"naaLe", o:["naaLe","nenne","alli"]},
+    {t:"fill", s:"___ kaaleejige raje ittu.", en:"Yesterday was a college holiday.", a:"nenne", o:["nenne","naaLe","ivattu"]},
+    {t:"type", q:"doDDa", a:["doDDadu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"cikka", a:["cikkadu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"nimma", a:["nimmadu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"avara", a:["avaradu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"uuru", a:["uuralli"], rule:"Say “in / at”", model:["mane","maneyalli"]},
+    {t:"type", q:"kaaleeju", a:["kaaleejalli"], rule:"Say “in / at”", model:["mane","maneyalli"]},
+    {t:"type", q:"hoTel", a:["hoTelalli"], rule:"Say “in / at”", model:["mane","maneyalli"]},
+    {t:"type", q:"maisuuru", a:["maisuuralli"], rule:"Say “in / at”", model:["bengaLuuru","bengaLuuralli"]},
+    {t:"type", q:"mane", a:["manege"], rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"uuTa", a:["uuTakke"], rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"kelasa", a:["kelasakke"], rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"avaru", a:["avarige"], rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"niivu", a:["nimage"], rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"naavu", a:["namage"], rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"build", kn:"idu eenu?", en:"What is this?"},
+    {t:"build", kn:"avaru nimma sneehitaraa?", en:"Are they your friends?"},
+    {t:"build", kn:"hampi ondu sundara nagara.", en:"Hampi is a beautiful city."},
+    {t:"build", kn:"nimma sneehita elli iddaare?", en:"Where is your friend?"}
+  ]
+},
+{
+  id: "u5", ref: "Lesson 6", title: "Asking around",
+  blurb: "Ask for directions, prices, dates and days, and learn the family words in pairs.",
+  notes: [
+    "Pick the question word by what you want to know: yaaru (who), yaara (whose), yaava (which), yaavaaga (when), elli (where), ellige (where to), eShTu (how much).",
+    "Many family words come in female / male pairs: taayi / tande, akka / aNNa, tangi / tamma, magaLu / maga.",
+    "kaDe means “side” or “direction”: nimma kaaleeju yaava kaDe ide? — Which side is your college on?"
+  ],
+  vocab: [
+    ["daari","way / road"],["bele","price"],["tarakaari","vegetables"],["yaavaaga","when"],
+    ["ellige","where to"],["taariiku","date"],["kaDe","side / direction"],["vaara","day of the week"],
+    ["yaavudu","which one"],["amma","mother"],["appa","father"],["henDati","wife"],
+    ["ganDa","husband"],["atte","aunt / mother-in-law"],["maava","uncle / father-in-law"],["magaLu","daughter"],
+    ["maga","son"],["cikkamma","aunt (father's younger brother's wife)"],["cikkappa","father's younger brother"],["sose","daughter-in-law"],
+    ["aLiya","son-in-law"],["mahiLe","woman"],["puruSha","man"],["shikShaki","teacher (female)"],["shikShaka","teacher (male)"]
+  ],
+  items: [
+    {t:"fill", s:"nimma kaaleeju ___ kaDe ide?", en:"Which side is your college on?", a:"yaava", o:["yaava","yaaru","eShTu"]},
+    {t:"fill", s:"kaaleejige hooguva ___ yaavudu?", en:"Which is the way to the college?", a:"daari", o:["daari","bele","vaara"]},
+    {t:"fill", s:"ii tarakaariya bele ___?", en:"What is the price of these vegetables?", a:"eShTu", o:["eShTu","elli","yaara"]},
+    {t:"fill", s:"nimma maatrubhaaShe ___?", en:"What is your mother tongue?", a:"yaavudu", o:["yaavudu","yaavaaga","ellige"]},
+    {t:"fill", s:"adu ___ mane?", en:"Whose house is that?  (from: adu nanna mane.)", a:"yaara", o:["yaara","yaaru","yaava"]},
+    {t:"fill", s:"naaLe ___ baruttaare?", en:"Who is coming tomorrow?  (from: naaLe appa baruttaare.)", a:"yaaru", o:["yaaru","yaara","eenu"]},
+    {t:"fill", s:"nanna aNNa ___ baruttaane?", en:"When is my brother coming?  (from: nanna aNNa naaLe baruttaane.)", a:"yaavaaga", o:["yaavaaga","elli","yaava"]},
+    {t:"fill", s:"ivattu ___ vaara?", en:"Which day is it today?  (from: ivattu soomavaara.)", a:"yaava", o:["yaava","yaaru","eShTu"]},
+    {t:"pair", kind:"gender", a:"taayi", b:"tande"},
+    {t:"pair", kind:"gender", a:"amma", b:"appa"},
+    {t:"pair", kind:"gender", a:"akka", b:"aNNa"},
+    {t:"pair", kind:"gender", a:"tangi", b:"tamma"},
+    {t:"pair", kind:"gender", a:"henDati", b:"ganDa"},
+    {t:"pair", kind:"gender", a:"atte", b:"maava"},
+    {t:"pair", kind:"gender", a:"huDugi", b:"huDuga"},
+    {t:"pair", kind:"gender", a:"vidyaarthini", b:"vidyaarthi"},
+    {t:"pair", kind:"gender", a:"sneehite", b:"sneehita"},
+    {t:"pair", kind:"gender", a:"shikShaki", b:"shikShaka"},
+    {t:"pair", kind:"gender", a:"mahiLe", b:"puruSha"},
+    {t:"pair", kind:"gender", a:"magaLu", b:"maga"},
+    {t:"pair", kind:"gender", a:"cikkamma", b:"cikkappa"},
+    {t:"pair", kind:"gender", a:"sose", b:"aLiya"},
+    {t:"build", kn:"niinu ellige hooguttaa iddiiya?", en:"Where are you going?"},
+    {t:"build", kn:"niivu yaavaaga baruttiiraa?", en:"When are you coming?"},
+    {t:"build", kn:"ivattu taariiku eShTu?", en:"What is the date today?"},
+    {t:"build", kn:"avu eenu?", en:"What are those?"}
+  ]
+},
+{
+  id: "u6", ref: "Lessons 7 & 8", title: "Colours & commands",
+  blurb: "Name colours, and give or follow simple instructions like stand up, come fast and listen.",
+  notes: [
+    "Colour of something: add -a / -ya to the thing, then baNNa: kurci → kurciya baNNa kempu (the chair's colour is red).",
+    "Commands have two forms: the short one for friends (nillu, koDu, baa) and the -i form for respect or for a group (nilli, koDi, banni).",
+    "beeku = need / want. nimage eenu beeku? — What do you need?"
+  ],
+  vocab: [
+    ["hasiru","green"],["niili","blue"],["kempu","red"],["biLi","white"],
+    ["kappu","black"],["haLadi","yellow"],["kurci","chair"],["baTTe","cloth"],
+    ["lekhani","pen"],["ele","leaf"],["byaagu","bag"],["kate","story"],
+    ["taaLme","patience"],["swanta","own"],["adhikaari","officer"],["tinDi","snack / tiffin"],
+    ["nillu / nilli","stand up"],["beega baa / banni","come fast"],["koDu / koDi","give"],["eeLu","get up"],
+    ["hattu","climb"],["aLu","cry"],["nagu","smile / laugh"],["keeLu","listen"],
+    ["nooDu","look / see"],["naDe","walk"],["kuDidaru","they drank"],["hoogooNa","let's go"],
+    ["tinnutteeve","we will eat"]
+  ],
+  items: [
+    {t:"fill", s:"eleya baNNa ___.", en:"The colour of the leaf is green.", a:"hasiru", o:["hasiru","kempu","kappu"]},
+    {t:"fill", s:"idu ___ baNNada baTTe.", en:"This is blue cloth.", a:"niili", o:["niili","haLadi","biLi"]},
+    {t:"fill", s:"kurciya baNNa ___.", en:"The chair is red.", a:"kempu", o:["kempu","hasiru","niili"]},
+    {t:"fill", s:"nimma kaaleeju eShTu ___ ide?", en:"How far is your college?", a:"duura", o:["duura","doDDa","hattu"]},
+    {t:"fill", s:"ii ruumu ___.", en:"This room is small.", a:"cikkadu", o:["cikkadu","doDDadu","kempu"]},
+    {t:"fill", s:"raamu niinu iigalee manege ___.", en:"Raamu, come home right now.", a:"baa", o:["baa","nooDu","aLu"]},
+    {t:"fill", s:"avaru coffeeyannu ___.", en:"They drank coffee.", a:"kuDidaru", o:["kuDidaru","hoogooNa","nagu"]},
+    {t:"fill", s:"naaLe naavu uurige ___.", en:"Tomorrow, let's go to our town.", a:"hoogooNa", o:["hoogooNa","kuDidaru","keeLu"]},
+    {t:"fill", s:"naavu tinDi ___.", en:"We will eat a snack.", a:"tinnutteeve", o:["tinnutteeve","hoogooNa","nillu"]},
+    {t:"fill", s:"nimage raje ___.", en:"You need a holiday.", a:"beeku", o:["beeku","beeDa","baa"]},
+    {t:"fill", s:"ninna hattira pennu ___?", en:"Do you have a pen with you?", a:"ideyaa", o:["ideyaa","eenu","yaaru"]},
+    {t:"build", kn:"beega banni.", en:"Come fast. (respectful)"},
+    {t:"build", kn:"idu niili baNNada baTTe.", en:"This is blue cloth."}
+  ]
+},
+{
+  id: "u7", ref: "Lessons 9 & 10", title: "Daily routine",
+  blurb: "Say what you want and don't want, find the library, and say who does what.",
+  notes: [
+    "Present tense ending shows who is acting: -uttaane (he), -uttaaLe (she), -uttaare (they, or he / she with respect), -utteene (I).",
+    "baru (come) → baruttaane, baruttaaLe, baruttaare. hoogu (go) → hooguttaane, hooguttaaLe, hooguttaare.",
+    "mattu means “and”: naanu mattu niinu — you and I."
+  ],
+  vocab: [
+    ["mattu","and"],["iiga","now"],["pariikShe","exam"],["vignaana","science"],
+    ["granthaalaya","library"],["aaTagaLu","games"],["vastugaLu","things"],["ella","all"],
+    ["raste","road"],["iru","be / stay"],["baru","come"],["tinnu","eat"],
+    ["aaDu","play"],["baruttaane","he comes"],["baruttaare","they come"],["hooguttaane","he goes"],
+    ["iddiini","I am (here)"],["iralla","won't be there"]
+  ],
+  items: [
+    {t:"fill", s:"naaLe ___ uurige hoogooNa.", en:"Tomorrow you and I will go to our town.", a:"naanu mattu niinu", o:["naanu mattu niinu","nanna mattu ninna","avaru"]},
+    {t:"fill", s:"nanage tea ___.", en:"I don't want tea.", a:"beeDa", o:["beeDa","beeku","gottu"]},
+    {t:"fill", s:"nimma kaaleejina raste ___?", en:"Which is the road to your college?", a:"yaavudu", o:["yaavudu","yaaru","eShTu"]},
+    {t:"fill", s:"naanu ___ bengaLuurige hoogutteene.", en:"I will go to Bengaluru tomorrow.", a:"naaLe", o:["naaLe","nenne","iiga"]},
+    {t:"fill", s:"gaNita mattu vignaanada pustakada bele ___?", en:"How much are the maths and science books?", a:"eShTu", o:["eShTu","elli","yaara"]},
+    {t:"fill", s:"ivattu namage ___ ide.", en:"Today we have an exam.", a:"pariikShe", o:["pariikShe","granthaalaya","raste"]},
+    {t:"fill", s:"granthaalaya ___?", en:"Where is the library?", a:"ellide", o:["ellide","iru","beeDa"]},
+    {t:"fill", s:"niinu granthaalayadalli ___.", en:"You stay in the library.", a:"iru", o:["iru","iralla","ellide"]},
+    {t:"type", q:"baru", a:["baruttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"hoogu", a:["hooguttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"tinnu", a:["tinnuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"keeLu", a:["keeLuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"nooDu", a:["nooDuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"aaDu", a:["aaDuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"baru", a:["baruttaare"], rule:"Say “they …”", model:["iru","iruttaare"]},
+    {t:"type", q:"hoogu", a:["hooguttaare"], rule:"Say “they …”", model:["iru","iruttaare"]},
+    {t:"type", q:"koDu", a:["koDuttaare"], rule:"Say “they …”", model:["iru","iruttaare"]},
+    {t:"build", kn:"kaaleejige baruttiyaa?", en:"Are you coming to college?"},
+    {t:"build", kn:"angaDiyalli ella vastugaLu siguttadeyaa?", en:"Is everything available at the shop?"},
+    {t:"build", kn:"indu aaTagaLu iralla.", en:"There are no games today."},
+    {t:"build", kn:"nanage iiga uuTa beeDa.", en:"I don't want food now."},
+    {t:"build", kn:"naanu bengaLuuralli iddiini.", en:"I am in Bengaluru."}
+  ]
+}
+];
+
+var LEVELS = 3;           // practice sessions to master a unit
+var SESSION_LEN = 12;
+var GOALS = [20, 40, 60];
+var STORE_KEY = "balake-kannada-v1";
+
+/* ---------------- helpers ---------------- */
+function $(sel, root) { return (root || document).querySelector(sel); }
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+function knHTML(s) { return '<span class="kn">' + esc(s).replace(/[A-Z]/g, function (m) { return '<b class="hs">' + m + "</b>"; }) + "</span>"; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pick(a, n) { return shuffle(a).slice(0, n); }
+function uniq(a) { var seen = {}; return a.filter(function (x) { if (seen[x]) return false; seen[x] = 1; return true; }); }
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function dayKey(d) { d = d || new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+function keyToUTC(k) { var p = k.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+function dayDiff(a, b) { return Math.round((keyToUTC(b) - keyToUTC(a)) / 86400000); }
+function addDays(k, n) { var d = new Date(keyToUTC(k) + n * 86400000); return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()); }
+function el(html) { var t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+function icon(id) { return '<svg aria-hidden="true"><use href="#' + id + '"/></svg>'; }
+
+/* ---------------- state & streak ---------------- */
+function freshState() { return { streak: 0, best: 0, lastDay: null, met: {}, xp: {}, xpTotal: 0, goal: 20, units: {}, answered: 0, correct: 0 }; }
+var S = freshState();
+try { var raw = localStorage.getItem(STORE_KEY); if (raw) { var parsed = JSON.parse(raw); for (var k in parsed) S[k] = parsed[k]; } } catch (e) { /* storage unavailable: run without saving */ }
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } }
+
+function liveStreak() {
+  if (!S.lastDay) return 0;
+  return dayDiff(S.lastDay, dayKey()) <= 1 ? S.streak : 0;
+}
+function todayXP() { return S.xp[dayKey()] || 0; }
+function goalMetToday() { return S.lastDay === dayKey(); }
+/* Called after XP changes or the goal changes. Returns true if today's goal was just reached. */
+function checkGoal() {
+  var t = dayKey();
+  if (todayXP() >= S.goal && S.lastDay !== t) {
+    S.streak = (S.lastDay && dayDiff(S.lastDay, t) === 1 ? S.streak : 0) + 1;
+    S.lastDay = t;
+    S.met[t] = true;
+    if (S.streak > S.best) S.best = S.streak;
+    save();
+    return true;
+  }
+  return false;
+}
+function addXP(n) {
+  var t = dayKey();
+  S.xp[t] = (S.xp[t] || 0) + n;
+  S.xpTotal += n;
+  save();
+  return checkGoal();
+}
+function unitLevel(id) { return Math.min(S.units[id] || 0, LEVELS); }
+function nextUnit() { for (var i = 0; i < UNITS.length; i++) if (unitLevel(UNITS[i].id) < LEVELS) return UNITS[i]; return null; }
+function wordsSeen() { return UNITS.filter(function (u) { return S.units[u.id]; }).reduce(function (n, u) { return n + u.vocab.length; }, 0); }
+
+/* ---------------- header ---------------- */
+function renderHeader() {
+  $("#brandName").innerHTML = knHTML("baLake kannaDa");
+  var st = liveStreak();
+  $("#chipStreakN").textContent = st;
+  $("#chipStreak").classList.toggle("cold", !goalMetToday());
+  $("#chipStreak").title = st + "-day streak" + (goalMetToday() ? " (today done)" : " (practise today)");
+  $("#chipXp").textContent = todayXP() + "/" + S.goal;
+}
+
+/* ---------------- routing ---------------- */
+var app = $("#app");
+var currentTab = "learn";
+function setTab(tab) {
+  currentTab = tab;
+  [].forEach.call(document.querySelectorAll("#tabs button"), function (b) {
+    if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+  });
+  try { localStorage.setItem(STORE_KEY + "-tab", tab); } catch (e) { /* ignore */ }
+  if (tab === "learn") renderLearn();
+  else if (tab === "words") renderWords();
+  else renderGuide();
+  window.scrollTo(0, 0);
+}
+$("#tabs").addEventListener("click", function (e) {
+  var b = e.target.closest("button[data-tab]");
+  if (b) { endSession(); setTab(b.dataset.tab); }
+});
+
+/* ---------------- LEARN ---------------- */
+function weekHTML() {
+  var t = dayKey(), out = "";
+  var names = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  for (var i = 6; i >= 0; i--) {
+    var k = addDays(t, -i);
+    var dow = new Date(keyToUTC(k)).getUTCDay();
+    var met = !!S.met[k];
+    out += '<div class="day' + (met ? " met" : "") + (i === 0 ? " today" : "") + '" title="' + k + (met ? " — goal met" : "") + '">' +
+      '<div class="sq">' + (met ? icon("i-check") : "") + "</div>" +
+      '<span class="d">' + (i === 0 ? "Today" : names[dow]) + "</span></div>";
+  }
+  return out;
+}
+function consoleMsg() {
+  var st = liveStreak(), left = Math.max(0, S.goal - todayXP());
+  if (goalMetToday()) return "Today's goal is done. Come back tomorrow to make it <strong>" + (st + 1) + " days</strong>.";
+  if (st > 0) return "Earn <strong>" + left + " more XP</strong> today to keep your " + st + "-day streak.";
+  if (S.best > 0) return "Your streak reset. Earn <strong>" + left + " XP</strong> today to start a new one.";
+  return "Finish one practice session a day to build a streak. Today: <strong>" + left + " XP</strong> to go.";
+}
+
+function renderLearn() {
+  renderHeader();
+  var st = liveStreak();
+  var pct = Math.min(100, Math.round(todayXP() / S.goal * 100));
+  var nu = nextUnit();
+  var goalOpts = GOALS.map(function (g) { return '<option value="' + g + '"' + (g === S.goal ? " selected" : "") + ">" + g + " XP" + (g === 20 ? " · 1 session" : g === 40 ? " · 2 sessions" : " · 3 sessions") + "</option>"; }).join("");
+
+  var rows = UNITS.map(function (u, i) {
+    var lv = unitLevel(u.id);
+    var cls = lv >= LEVELS ? "done" : lv > 0 ? "started" : "";
+    if (nu && nu.id === u.id) cls += " next";
+    var pips = ""; for (var p = 0; p < LEVELS; p++) pips += "<i" + (p < lv ? ' class="on"' : "") + "></i>";
+    return '<li><button class="unit-row ' + cls + '" data-unit="' + u.id + '">' +
+      '<span class="node">' + (lv >= LEVELS ? icon("i-check").replace("<svg", '<svg width="22" height="22"') : pad(i + 1)) + "</span>" +
+      '<span class="info"><span class="ttl">' + esc(u.title) + "</span>" +
+      '<span class="sub">' + esc(u.ref) + " · " + u.vocab.length + " words</span></span>" +
+      '<span style="display:grid;gap:6px;justify-items:end">' + (nu && nu.id === u.id ? '<span class="tag-next">Next</span>' : "") + '<span class="pips" title="' + lv + " of " + LEVELS + ' sessions">' + pips + "</span></span>" +
+      "</button></li>";
+  }).join("");
+
+  var practised = UNITS.filter(function (u) { return S.units[u.id]; }).length;
+  app.innerHTML =
+    '<section class="view">' +
+      '<div class="panel console">' +
+        '<div class="big-streak' + (goalMetToday() ? "" : " cold") + '">' + icon("i-flame") +
+          '<div><div class="n">' + st + '</div><div class="u">day streak</div></div></div>' +
+        '<p class="console-msg">' + consoleMsg() + "</p>" +
+        '<div class="week">' + weekHTML() + "</div>" +
+        '<div class="goalrow"><div class="top-line"><span class="label">Daily goal · ' + todayXP() + " / " + S.goal + " XP</span>" +
+          '<label class="goal-select"><span class="label">Goal</span><select id="goalSel" aria-label="Daily goal">' + goalOpts + "</select></label></div>" +
+          '<div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><i style="width:' + pct + '%"></i></div></div>' +
+        '<div class="stats">' +
+          '<div class="stat"><div class="v">' + S.best + '</div><div class="label">Best streak</div></div>' +
+          '<div class="stat"><div class="v">' + S.xpTotal + '</div><div class="label">Total XP</div></div>' +
+          '<div class="stat"><div class="v">' + wordsSeen() + '</div><div class="label">Words met</div></div>' +
+        "</div>" +
+      "</div>" +
+      '<div class="track-head"><div><div class="label">Course · 7 units</div><h2>Your path</h2></div>' +
+        '<div class="cta-row">' +
+          (nu ? '<button class="btn" id="startNext">' + (S.units[nu.id] ? "Continue" : "Start") + " unit " + (UNITS.indexOf(nu) + 1) + "</button>" : "") +
+          '<button class="btn ghost" id="reviewBtn"' + (practised ? "" : " disabled") + ' title="' + (practised ? "Mixed questions from units you have practised" : "Practise a unit first") + '">Mixed review</button>' +
+        "</div></div>" +
+      '<ol class="track">' + rows + "</ol>" +
+    "</section>";
+
+  $("#goalSel").addEventListener("change", function (e) { S.goal = +e.target.value; save(); checkGoal(); renderLearn(); });
+  app.querySelectorAll("[data-unit]").forEach(function (b) { b.addEventListener("click", function () { renderUnit(b.dataset.unit); }); });
+  if (nu) $("#startNext").addEventListener("click", function () { startSession([nu], nu.id); });
+  $("#reviewBtn").addEventListener("click", function () {
+    var done = UNITS.filter(function (u) { return S.units[u.id]; });
+    if (done.length) startSession(done, null);
+  });
+}
+
+/* ---------------- UNIT DETAIL ---------------- */
+function renderUnit(id) {
+  var u = UNITS.filter(function (x) { return x.id === id; })[0];
+  var idx = UNITS.indexOf(u);
+  var lv = unitLevel(id);
+  app.innerHTML =
+    '<section class="view">' +
+      '<button class="back" id="back">← All units</button>' +
+      '<div class="unit-head"><div class="label">Unit ' + pad(idx + 1) + " · " + esc(u.ref) + "</div>" +
+        "<h1>" + esc(u.title) + "</h1><p class=\"muted\">" + esc(u.blurb) + "</p></div>" +
+      '<div class="cta-row"><button class="btn" id="go">' + (lv ? "Practise again" : "Start practice") + "</button>" +
+        '<span class="muted">' + lv + " of " + LEVELS + " sessions done · " + SESSION_LEN + " questions each</span></div>" +
+      '<div class="panel" style="display:grid;gap:14px"><h3>How it works</h3><ul class="notes">' +
+        u.notes.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + "</ul></div>" +
+      '<div style="display:grid;gap:12px"><div class="label">Words in this unit · ' + u.vocab.length + "</div>" +
+        '<div class="vocab">' + u.vocab.map(function (v) { return "<div>" + knHTML(v[0]) + '<span class="en">' + esc(v[1]) + "</span></div>"; }).join("") + "</div></div>" +
+    "</section>";
+  $("#back").addEventListener("click", renderLearn);
+  $("#go").addEventListener("click", function () { startSession([u], u.id); });
+  window.scrollTo(0, 0);
+}
+
+/* ---------------- SESSION ENGINE ---------------- */
+var SESSION = null;
+
+function vocabPool(units) {
+  var out = [];
+  units.forEach(function (u) { u.vocab.forEach(function (v) { out.push({ kn: v[0], en: v[1] }); }); });
+  return out;
+}
+
+function buildQuestions(units) {
+  var hand = [];
+  units.forEach(function (u) { u.items.forEach(function (it) { hand.push({ it: it, u: u }); }); });
+  hand = shuffle(hand);
+  // Keep a varied mix: at most 3 of the same type
+  var byType = {}, chosen = [];
+  hand.forEach(function (h) {
+    if (chosen.length >= 8) return;
+    var t = h.it.t; byType[t] = (byType[t] || 0);
+    if (byType[t] < 3) { byType[t]++; chosen.push(h); }
+  });
+  hand.forEach(function (h) { if (chosen.length < 8 && chosen.indexOf(h) < 0) chosen.push(h); });
+
+  var vp = vocabPool(units);
+  var qs = chosen.map(function (h) { return { kind: h.it.t, it: h.it, u: h.u }; });
+  pick(vp, 2).forEach(function (w) { qs.push({ kind: "toEn", w: w, pool: vp }); });
+  pick(vp, 1).forEach(function (w) { qs.push({ kind: "toKn", w: w, pool: vp }); });
+  qs = shuffle(qs).slice(0, SESSION_LEN - 1);
+  qs.splice(Math.min(4, qs.length), 0, { kind: "match", pool: vp });
+  return qs;
+}
+
+function startSession(units, unitId) {
+  SESSION = { units: units, unitId: unitId, queue: buildQuestions(units), done: 0, firstTry: 0, mistakes: 0, retried: {} };
+  SESSION.total = SESSION.queue.length;
+  renderQuestion();
+}
+function endSession() { SESSION = null; document.onkeydown = null; }
+
+var KIND_LABEL = { fill: "Fill in the blank", build: "Translate into Kannada", type: "Transform the word", pair: "Pairs", toEn: "What does it mean?", toKn: "Choose the Kannada", match: "Match the pairs" };
+
+function renderQuestion() {
+  if (!SESSION) return;
+  if (!SESSION.queue.length) return renderResult();
+  var q = SESSION.queue[0];
+  var pct = Math.round(SESSION.done / SESSION.total * 100);
+  app.innerHTML =
+    '<section class="session">' +
+      '<div class="s-top"><button class="quit" id="quit" aria-label="Quit session" title="Quit (progress in this session is lost)">' + icon("i-x") + "</button>" +
+        '<div class="meter"><i style="width:' + pct + '%"></i></div>' +
+        '<span class="s-count">' + SESSION.done + "/" + SESSION.total + "</span></div>" +
+      '<div class="label q-kind">' + (q.retry ? "Try again · " : "") + KIND_LABEL[q.kind] + "</div>" +
+      '<div id="qbody" style="display:grid;gap:20px"></div>' +
+      '<div class="feedback" id="fb"><div class="fb-text" id="fbText"></div><div class="fb-actions"><button class="btn" id="checkBtn" disabled>Check</button></div></div>' +
+    "</section>";
+  $("#quit").addEventListener("click", function () { endSession(); renderLearn(); });
+
+  var body = $("#qbody");
+  var api = RENDER[q.kind](q, body, function (ready) { $("#checkBtn").disabled = !ready; });
+  var answered = false;
+  var checkBtn = $("#checkBtn");
+
+  function doCheck() {
+    if (answered || checkBtn.disabled) return;
+    answered = true;
+    var r = api.check();
+    showFeedback(q, r);
+  }
+  function showFeedback(q, r) {
+    var fb = $("#fb");
+    fb.className = "feedback " + (r.ok ? "ok" : "bad");
+    var title = r.ok ? (r.almost ? "Correct — mind the capitals" : pickPraise()) : "Not quite";
+    $("#fbText").innerHTML = '<div class="fb-title">' + title + "</div>" +
+      (r.ok && !r.almost ? (r.extra ? '<div class="fb-ans">' + r.extra + "</div>" : "") :
+        '<div class="fb-ans">' + (r.ok ? "Exact spelling: " : "Correct answer: ") + r.answer + "</div>");
+    checkBtn.textContent = "Continue";
+    checkBtn.disabled = false;
+    checkBtn.className = "btn " + (r.ok ? "okb" : "badb");
+    if (r.ok) {
+      SESSION.done++;
+      if (!q.retry) SESSION.firstTry++;
+      SESSION.queue.shift();
+    } else {
+      SESSION.mistakes++;
+      SESSION.queue.shift();
+      var key = JSON.stringify(q.it || q.w || "m");
+      SESSION.retried[key] = (SESSION.retried[key] || 0) + 1;
+      if (SESSION.retried[key] <= 2) {
+        var copy = {}; for (var k in q) copy[k] = q[k]; copy.retry = true;
+        SESSION.queue.push(copy);
+      } else {
+        SESSION.done++;
+      }
+    }
+    S.answered++; if (r.ok && !q.retry) S.correct++; save();
+    checkBtn.onclick = function () { renderQuestion(); };
+    checkBtn.focus();
+  }
+  checkBtn.onclick = doCheck;
+  if (api.auto) api.auto(function (r) { answered = true; showFeedback(q, r); });
+
+  document.onkeydown = function (e) {
+    if (e.target && e.target.tagName === "SELECT") return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (answered) renderQuestion(); else doCheck();
+    } else if (!answered && api.key && /^[1-9]$/.test(e.key) && !(e.target && e.target.tagName === "INPUT")) {
+      api.key(+e.key);
+    }
+  };
+  if (api.focus) api.focus();
+}
+var PRAISE = ["Correct", "Right", "Well done", "Exactly", "Good"];
+function pickPraise() { return PRAISE[Math.floor(Math.random() * PRAISE.length)]; }
+
+/* choice list shared by several exercise types */
+function choiceList(body, options, isKn, onReady) {
+  var wrap = el('<div class="opts" role="listbox"></div>');
+  var sel = null;
+  options.forEach(function (o, i) {
+    var b = el('<button class="opt" role="option"><span class="k">' + (i + 1) + '</span><span class="t">' + (isKn ? knHTML(o) : esc(o)) + "</span></button>");
+    b.addEventListener("click", function () { choose(i); });
+    wrap.appendChild(b);
+  });
+  function choose(i) {
+    if (i < 0 || i >= options.length) return;
+    sel = i;
+    [].forEach.call(wrap.children, function (c, j) { c.classList.toggle("sel", j === i); c.setAttribute("aria-selected", j === i); });
+    onReady(true);
+  }
+  body.appendChild(wrap);
+  return {
+    get: function () { return sel === null ? null : options[sel]; },
+    key: function (n) { choose(n - 1); },
+    mark: function (correct) {
+      [].forEach.call(wrap.children, function (c, j) {
+        c.disabled = true;
+        if (options[j] === correct) c.classList.add("right");
+        else if (j === sel) c.classList.add("wrong");
+      });
+    }
+  };
+}
+
+/* true when two English glosses share a meaningful word ("town / city" vs "city"), so they never compete as options */
+var STOP = { the:1, of:1, to:1, for:1, a:1, an:1, is:1, are:1, there:1, when:1, counting:1, s:1 };
+function glossWords(en) { return en.toLowerCase().split(/[^a-z]+/).filter(function (w) { return w && !STOP[w]; }); }
+function overlaps(a, b) { var wa = glossWords(a); return glossWords(b).some(function (w) { return wa.indexOf(w) >= 0; }); }
+
+function norm(s) { return s.trim().replace(/\s+/g, " ").replace(/[?.!,]+$/, ""); }
+
+var RENDER = {
+  fill: function (q, body, onReady) {
+    var it = q.it;
+    var sentence = knHTML(it.s).replace("___", '<span class="blank" id="blank">?</span>');
+    body.appendChild(el('<div style="display:grid;gap:8px"><div class="sentence">' + sentence + '</div><div class="hint">' + esc(it.en) + "</div></div>"));
+    var opts = shuffle(it.o);
+    var cl = choiceList(body, opts, true, function (r) {
+      onReady(r);
+      var v = cl && cl.get(); if (v) $("#blank").innerHTML = knHTML(v);
+    });
+    return {
+      key: cl.key,
+      check: function () {
+        var v = cl.get(); cl.mark(it.a);
+        var full = it.s.replace("___", it.a);
+        return { ok: v === it.a, answer: knHTML(full), extra: knHTML(full) };
+      }
+    };
+  },
+
+  toEn: function (q, body, onReady) {
+    body.appendChild(el('<div class="prompt">' + knHTML(q.w.kn) + "</div>"));
+    var others = uniq(q.pool.filter(function (w) { return w.kn !== q.w.kn && !overlaps(w.en, q.w.en); }).map(function (w) { return w.en; }));
+    var opts = shuffle([q.w.en].concat(pick(others, 3)));
+    var cl = choiceList(body, opts, false, onReady);
+    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(q.w.en); return { ok: v === q.w.en, answer: esc(q.w.en) }; } };
+  },
+
+  toKn: function (q, body, onReady) {
+    body.appendChild(el('<div class="prompt">“' + esc(q.w.en) + "”</div>"));
+    var others = uniq(q.pool.filter(function (w) { return w.kn !== q.w.kn && !overlaps(w.en, q.w.en); }).map(function (w) { return w.kn; }));
+    var opts = shuffle([q.w.kn].concat(pick(others, 3)));
+    var cl = choiceList(body, opts, true, onReady);
+    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(q.w.kn); return { ok: v === q.w.kn, answer: knHTML(q.w.kn) }; } };
+  },
+
+  pair: function (q, body, onReady) {
+    var it = q.it;
+    var siblings = q.u.items.filter(function (x) { return x.t === "pair" && x.kind === it.kind && x.b !== it.b; });
+    var opts = shuffle([it.b].concat(pick(siblings.map(function (x) { return x.b; }), 3)));
+    var gloss = function (w) { var hit = vocabPool([q.u].concat(UNITS)).filter(function (v) { return v.kn === w; })[0]; return hit ? " (" + esc(hit.en) + ")" : ""; };
+    var prompt = it.kind === "opp" ? "What is the opposite of " : "What is the male form of ";
+    body.appendChild(el('<div class="prompt">' + prompt + knHTML(it.a) + '<span class="muted" style="font-size:16px">' + gloss(it.a) + "</span>?</div>"));
+    var cl = choiceList(body, opts, true, onReady);
+    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(it.b); return { ok: v === it.b, answer: knHTML(it.a) + " ↔ " + knHTML(it.b) + gloss(it.b) }; } };
+  },
+
+  type: function (q, body, onReady) {
+    var it = q.it;
+    body.appendChild(el('<div style="display:grid;gap:10px"><div class="model muted">Model: ' + knHTML(it.model[0]) + '<span class="arrow">→</span>' + knHTML(it.model[1]) + "</div>" +
+      '<div class="prompt">' + esc(it.rule) + ": " + knHTML(it.q) + "</div></div>"));
+    var wrap = el('<div class="type-in"><input type="text" id="typeAns" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type in English letters…" aria-label="Your answer"><span class="hint">Long vowels are doubled (aa, ii, uu, ee, oo). Hard sounds are capitals: T D N L Sh.</span></div>');
+    body.appendChild(wrap);
+    var inp = $("#typeAns");
+    inp.addEventListener("input", function () { onReady(norm(inp.value).length > 0); });
+    return {
+      focus: function () { inp.focus(); },
+      check: function () {
+        var v = norm(inp.value);
+        inp.disabled = true;
+        var exact = it.a.some(function (a) { return a === v; });
+        var loose = !exact && it.a.some(function (a) { return a.toLowerCase() === v.toLowerCase(); });
+        return { ok: exact || loose, almost: loose, answer: knHTML(it.a[0]) };
+      }
+    };
+  },
+
+  build: function (q, body, onReady) {
+    var it = q.it;
+    var target = norm(it.kn).split(" ").map(function (w) { return w.replace(/[?.!,]/g, ""); });
+    var extras = uniq(vocabPool([q.u]).map(function (v) { return v.kn; }).filter(function (w) { return w.indexOf(" ") < 0 && w.indexOf("/") < 0 && target.indexOf(w.replace(/[?]/g, "")) < 0; }));
+    var tiles = shuffle(target.concat(pick(extras, Math.min(3, extras.length)).map(function (w) { return w.replace(/[?]/g, ""); })));
+    body.appendChild(el('<div class="prompt">“' + esc(it.en) + "”</div>"));
+    var slots = el('<div class="slots" aria-label="Your sentence"></div>');
+    var bank = el('<div class="bank" aria-label="Word bank"></div>');
+    body.appendChild(slots); body.appendChild(bank);
+    var placed = [];
+    tiles.forEach(function (w, i) {
+      var b = el('<button class="tile">' + knHTML(w) + "</button>");
+      b.addEventListener("click", function () {
+        if (b.disabled) return;
+        b.classList.add("ghosted");
+        var p = el('<button class="tile">' + knHTML(w) + "</button>");
+        p.addEventListener("click", function () {
+          if (p.disabled) return;
+          slots.removeChild(p); b.classList.remove("ghosted");
+          placed.splice(placed.indexOf(entry), 1); onReady(placed.length > 0);
+        });
+        var entry = { w: w, i: i, node: p };
+        placed.push(entry); slots.appendChild(p); onReady(true);
+      });
+      bank.appendChild(b);
+    });
+    return {
+      check: function () {
+        [].forEach.call(body.querySelectorAll(".tile"), function (t) { t.disabled = true; });
+        var got = placed.map(function (p) { return p.w; }).join(" ");
+        return { ok: got === target.join(" "), answer: knHTML(it.kn) };
+      }
+    };
+  },
+
+  match: function (q, body, onReady) {
+    var seen = {}, pairs = [];
+    shuffle(q.pool).forEach(function (w) { if (pairs.length < 5 && !seen[w.kn] && !pairs.some(function (p) { return overlaps(p.en, w.en); })) { seen[w.kn] = 1; pairs.push(w); } });
+    var left = shuffle(pairs), right = shuffle(pairs);
+    body.appendChild(el('<div class="prompt">Tap a Kannada word, then its meaning.</div>'));
+    var grid = el('<div class="match"><div class="col" id="mL"></div><div class="col" id="mR"></div></div>');
+    body.appendChild(grid);
+    var selL = null, selR = null, matched = 0, errs = 0, finish = null;
+    function mk(side, w, html) {
+      var b = el('<button class="opt"><span class="t">' + html + "</span></button>");
+      b.dataset.kn = w.kn;
+      b.addEventListener("click", function () {
+        if (b.disabled) return;
+        var col = side === "L" ? $("#mL") : $("#mR");
+        [].forEach.call(col.children, function (c) { c.classList.remove("sel", "wrong"); });
+        b.classList.add("sel");
+        if (side === "L") selL = b; else selR = b;
+        if (selL && selR) {
+          if (selL.dataset.kn === selR.dataset.kn) {
+            [selL, selR].forEach(function (x) { x.classList.remove("sel"); x.classList.add("done"); x.disabled = true; });
+            matched++;
+            if (matched === pairs.length && finish) finish({ ok: true, extra: errs ? errs + " wrong tap" + (errs > 1 ? "s" : "") + " along the way." : "All pairs matched first time." });
+          } else {
+            errs++;
+            var a = selL, c = selR;
+            [a, c].forEach(function (x) { x.classList.remove("sel"); x.classList.add("wrong"); });
+            setTimeout(function () { a.classList.remove("wrong"); c.classList.remove("wrong"); }, 450);
+          }
+          selL = selR = null;
+        }
+      });
+      return b;
+    }
+    left.forEach(function (w) { $("#mL").appendChild(mk("L", w, knHTML(w.kn))); });
+    right.forEach(function (w) { $("#mR").appendChild(mk("R", w, esc(w.en))); });
+    onReady(false);
+    $("#checkBtn").hidden = true;
+    return {
+      auto: function (cb) { finish = function (r) { $("#checkBtn").hidden = false; cb(r); }; },
+      check: function () { return { ok: true }; }
+    };
+  }
+};
+
+/* ---------------- RESULT ---------------- */
+function renderResult() {
+  var s = SESSION;
+  var xp = 10 + s.firstTry;
+  var before = liveStreak();
+  var hitGoal = addXP(xp);
+  if (s.unitId) { S.units[s.unitId] = (S.units[s.unitId] || 0) + 1; save(); }
+  var acc = Math.round(s.firstTry / s.total * 100);
+  var st = liveStreak();
+  renderHeader();
+  var streakLine = hitGoal
+    ? '<div class="streak-up anim">' + icon("i-flame") + '<div><h2>' + st + "-day streak</h2><p class=\"muted\">" + (st > before ? "Daily goal reached. Your streak grew by one." : "Daily goal reached.") + "</p></div></div>"
+    : goalMetToday()
+      ? '<div class="streak-up">' + icon("i-flame") + '<div><h2>' + st + "-day streak</h2><p class=\"muted\">Today is already counted. Extra practice still earns XP.</p></div></div>"
+      : '<div class="streak-up" style="opacity:.8">' + icon("i-flame") + '<div><h2>' + Math.max(0, S.goal - todayXP()) + " XP to today's goal</h2><p class=\"muted\">One more session keeps the streak alive.</p></div></div>";
+  endSession();
+  app.innerHTML =
+    '<section class="view result">' +
+      '<div class="label">Session complete' + (s.unitId ? " · " + esc(UNITS.filter(function (u) { return u.id === s.unitId; })[0].title) : " · Mixed review") + "</div>" +
+      "<h1>" + (acc >= 90 ? "Sharp work." : acc >= 70 ? "Solid session." : "Keep at it — repetition is how it sticks.") + "</h1>" +
+      streakLine +
+      '<div class="result-grid">' +
+        '<div class="panel"><div class="v" style="color:var(--cyan)">+' + xp + '</div><div class="label">XP earned</div></div>' +
+        '<div class="panel"><div class="v">' + acc + '%</div><div class="label">First-try accuracy</div></div>' +
+        '<div class="panel"><div class="v">' + s.mistakes + '</div><div class="label">Wrong answers</div></div>' +
+      "</div>" +
+      '<div class="cta-row"><button class="btn" id="cont">Continue</button>' +
+        (s.unitId ? '<button class="btn ghost" id="again">Practise again</button>' : "") + "</div>" +
+    "</section>";
+  $("#cont").addEventListener("click", renderLearn);
+  if (s.unitId) $("#again").addEventListener("click", function () { startSession(s.units, s.unitId); });
+  $("#cont").focus();
+}
+
+/* ---------------- WORDS ---------------- */
+function renderWords() {
+  renderHeader();
+  app.innerHTML =
+    '<section class="view">' +
+      '<div><div class="label">Word list</div><h1>Every word in the course</h1></div>' +
+      '<div class="searchbar"><input type="search" id="wq" placeholder="Search Kannada or English…" aria-label="Search words" autocomplete="off" spellcheck="false"></div>' +
+      '<div id="wlist" style="display:grid;gap:24px"></div>' +
+    "</section>";
+  var q = $("#wq");
+  function draw() {
+    var term = q.value.trim().toLowerCase(), html = "", total = 0;
+    UNITS.forEach(function (u, i) {
+      var list = u.vocab.filter(function (v) { return !term || v[0].toLowerCase().indexOf(term) >= 0 || v[1].toLowerCase().indexOf(term) >= 0; });
+      if (!list.length) return;
+      total += list.length;
+      html += '<div class="word-group"><div class="label">Unit ' + pad(i + 1) + " · " + esc(u.title) + " · " + esc(u.ref) + '</div><div class="word-list">' +
+        list.map(function (v) { return "<div>" + knHTML(v[0]) + '<span class="en">' + esc(v[1]) + "</span></div>"; }).join("") + "</div></div>";
+    });
+    $("#wlist").innerHTML = total ? html : '<p class="empty">No word matches “' + esc(q.value) + '”. Try the English meaning, or fewer letters.</p>';
+  }
+  q.addEventListener("input", draw);
+  draw();
+}
+
+/* ---------------- GUIDE ---------------- */
+function renderGuide() {
+  renderHeader();
+  var rows = [
+    ["t", "T", "tande (father)", "uuTa (meal)"],
+    ["d", "D", "adu (that)", "doDDa (big)"],
+    ["n", "N", "naanu (I)", "aNNa (elder brother)"],
+    ["l", "L", "illi (here)", "avaLu (she)"],
+    ["s / sh", "Sh", "sundara (beautiful)", "maatrubhaaShe (mother tongue)"]
+  ];
+  var vowels = [["a", "aa", "akka", "aaTa"], ["i", "ii", "illi", "iiga"], ["u", "uu", "huDugi", "uuru"], ["e", "ee", "ele", "eenu"], ["o", "oo", "oLage", "nooDu"]];
+  app.innerHTML =
+    '<section class="view">' +
+      '<div><div class="label">Sound key</div><h1>How to read the spelling</h1></div>' +
+      '<div class="prose"><p>No Kannada script is used here. Every word is written in English letters, and the spelling tells you how to say it.</p>' +
+        "<p><strong>A capital letter is a hard, stressed sound</strong>, made with the tip of the tongue curled back to the roof of the mouth. It is never used just because a word starts a sentence: write " + knHTML("bengaLuuru") + ", not Bengaluru. On this site, stressed letters glow pink so you can spot them.</p></div>" +
+      '<div class="panel" style="display:grid;gap:12px"><h3>Soft vs hard consonants</h3><div class="table-scroll"><table class="key-table">' +
+        "<thead><tr><th>Soft</th><th>Hard</th><th>Soft example</th><th>Hard example</th></tr></thead><tbody>" +
+        rows.map(function (r) { return "<tr><td>" + knHTML(r[0]) + "</td><td>" + knHTML(r[1]) + "</td><td>" + knHTML(r[2].split(" ")[0]) + ' <span class="muted">' + esc(r[2].split(" ").slice(1).join(" ")) + "</span></td><td>" + knHTML(r[3].split(" ")[0]) + ' <span class="muted">' + esc(r[3].split(" ").slice(1).join(" ")) + "</span></td></tr>"; }).join("") +
+        "</tbody></table></div></div>" +
+      '<div class="panel" style="display:grid;gap:12px"><h3>Short vs long vowels</h3><p class="muted">A doubled vowel is held twice as long.</p><div class="table-scroll"><table class="key-table">' +
+        "<thead><tr><th>Short</th><th>Long</th><th>Short example</th><th>Long example</th></tr></thead><tbody>" +
+        vowels.map(function (r) { return "<tr><td>" + knHTML(r[0]) + "</td><td>" + knHTML(r[1]) + "</td><td>" + knHTML(r[2]) + "</td><td>" + knHTML(r[3]) + "</td></tr>"; }).join("") +
+        "</tbody></table></div></div>" +
+      '<div class="prose"><p><strong>Double consonants</strong> are held a beat longer: ' + knHTML("akka") + ", " + knHTML("cikka") + ", " + knHTML("illi") + ", " + knHTML("aNNa") + ".</p>" +
+        "<p><strong>c</strong> is always the “ch” in “chair”: " + knHTML("cikka") + " (small), " + knHTML("kurci") + " (chair).</p></div>" +
+      '<div style="display:grid;gap:16px"><div class="label">Grammar notes from every unit</div>' +
+        UNITS.map(function (u, i) { return '<div class="panel" style="display:grid;gap:10px"><h3>Unit ' + pad(i + 1) + " · " + esc(u.title) + ' <span class="muted" style="font-weight:500">' + esc(u.ref) + '</span></h3><ul class="notes">' + u.notes.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + "</ul></div>"; }).join("") +
+      "</div>" +
+      '<div class="panel" style="display:grid;gap:12px"><h3>Your progress data</h3><p class="muted">Your streak and progress are saved in this browser only. Clearing site data or switching device starts fresh.</p>' +
+        '<div class="reset-zone" id="resetZone"><button class="btn danger small" id="resetBtn">Reset all progress</button></div></div>' +
+    "</section>";
+  $("#resetBtn").addEventListener("click", function () {
+    $("#resetZone").innerHTML = '<span>Erase your streak, XP and unit progress?</span><button class="btn danger small" id="resetYes">Erase everything</button><button class="btn ghost small" id="resetNo">Keep it</button>';
+    $("#resetYes").addEventListener("click", function () { var g = S.goal; S = freshState(); S.goal = g; save(); setTab("learn"); });
+    $("#resetNo").addEventListener("click", renderGuide);
+  });
+}
+
+/* ---------------- boot ---------------- */
+var startTab = "learn";
+try { var hashTab = (location.hash || "").replace("#", ""); var saved = localStorage.getItem(STORE_KEY + "-tab"); startTab = ["learn", "words", "guide"].indexOf(hashTab) >= 0 ? hashTab : (saved || "learn"); } catch (e) { /* ignore */ }
+if (["learn", "words", "guide"].indexOf(startTab) < 0) startTab = "learn";
+setTab(startTab);
+// Refresh the streak display if the day rolls over while the page is open
+document.addEventListener("visibilitychange", function () { if (!document.hidden && !SESSION) renderHeader(); });
+})();
+</script>
+</body>
+</html>
