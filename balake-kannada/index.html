@@ -156,6 +156,24 @@ select {
 .stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
 .stat .v { font: 700 20px/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
 
+/* ---------- reminders ---------- */
+.remind { display: grid; gap: 16px; }
+.remind-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.remind-head p { max-width: 58ch; font-size: 14px; }
+.remind-times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rslot { display: grid; gap: 6px; min-width: 0; }
+input[type="time"] {
+  width: 100%; background: var(--panel-2); border: 1px solid var(--line); padding: 8px 10px;
+  font: 600 15px/1.2 var(--f-mono); font-variant-numeric: tabular-nums;
+}
+input[type="time"]:disabled { opacity: .5; }
+input[type="time"]:focus { outline: none; border-color: var(--cyan); }
+.banner { background: #1d1a08; border-bottom: 1px solid var(--yellow); }
+.banner .wrap { display: flex; align-items: center; gap: 12px; padding-block: 10px; flex-wrap: wrap; }
+.banner svg { width: 22px; height: 22px; color: var(--yellow); flex: none; }
+.banner p { flex: 1 1 240px; min-width: 0; }
+.banner-actions { display: flex; gap: 8px; }
+
 /* ---------- unit track ---------- */
 .track-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
 .track { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; position: relative; }
@@ -266,7 +284,11 @@ input[type="text"]:focus, input[type="search"]:focus { outline: none; border-col
 .fb-title { font: 700 17px/1.2 var(--f-display); }
 .feedback.ok .fb-title { color: var(--ok); }
 .feedback.bad .fb-title { color: var(--bad); }
-.fb-ans { font-size: 15px; overflow-wrap: anywhere; }
+.fb-ans { font-size: 16px; overflow-wrap: anywhere; }
+.fb-en { font-size: 15px; overflow-wrap: anywhere; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.fb-k { font: 600 10px/1.6 var(--f-display); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); min-width: 74px; }
+.fb-yours { opacity: .85; }
+.fb-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 16px; font-size: 14px; }
 .fb-actions { display: flex; gap: 10px; align-items: center; }
 
 /* results */
@@ -301,6 +323,7 @@ input[type="text"]:focus, input[type="search"]:focus { outline: none; border-col
   .prompt { font-size: 19px; }
   .sentence { font-size: 19px; }
   .result-grid { grid-template-columns: 1fr; }
+  .remind-times { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .searchbar { top: calc(env(safe-area-inset-top, 0px) + 96px); }
 }
@@ -330,6 +353,14 @@ input[type="text"]:focus, input[type="search"]:focus { outline: none; border-col
     </nav>
   </div>
 </header>
+
+<div class="banner" id="banner" role="status" hidden>
+  <div class="wrap">
+    <svg aria-hidden="true"><use href="#i-flame"/></svg>
+    <p id="bannerText"></p>
+    <div class="banner-actions"><button class="btn small" id="bannerGo">Practise now</button><button class="btn ghost small" id="bannerX">Dismiss</button></div>
+  </div>
+</div>
 
 <main class="wrap" id="app"></main>
 
@@ -373,15 +404,15 @@ var UNITS = [
     {t:"fill", s:"nimma hesaru ___?", en:"What is your name?", a:"eenu", o:["yaaru","eenu","yaava"]},
     {t:"fill", s:"ivaru ___ tande.", en:"He is my father.", a:"nanna", o:["nanna","naanu","idu"]},
     {t:"fill", s:"ivaLu ___ akka.", en:"She is our elder sister.", a:"namma", o:["namma","naanu","yaaru"]},
-    {t:"type", q:"mane", a:["maneenaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
-    {t:"type", q:"huDugi", a:["huDuginaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
-    {t:"type", q:"avaLu", a:["avaLaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
-    {t:"type", q:"kaaleeju", a:["kaaleejaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
-    {t:"type", q:"uuTa", a:["uuTaanaa"], rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
-    {t:"type", q:"naanu", a:["nanna"], rule:"Make the “of” form", model:["niivu","nimma"]},
-    {t:"type", q:"avaru", a:["avara"], rule:"Make the “of” form", model:["niivu","nimma"]},
-    {t:"type", q:"adu", a:["adara"], rule:"Make the “of” form", model:["niivu","nimma"]},
-    {t:"type", q:"avu", a:["avugaLa"], rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"type", q:"mane", a:["maneenaa"], en:"Is it a house?", rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"huDugi", a:["huDuginaa"], en:"Is she a girl?", rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"avaLu", a:["avaLaa"], en:"Is it her?", rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"kaaleeju", a:["kaaleejaa"], en:"Is it the college?", rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"uuTa", a:["uuTaanaa"], en:"Is it the meal?", rule:"Make it a yes/no question", model:["beLagaavi","beLagaavinaa?"]},
+    {t:"type", q:"naanu", a:["nanna"], en:"my", rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"type", q:"avaru", a:["avara"], en:"their", rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"type", q:"adu", a:["adara"], en:"its / of that", rule:"Make the “of” form", model:["niivu","nimma"]},
+    {t:"type", q:"avu", a:["avugaLa"], en:"of those", rule:"Make the “of” form", model:["niivu","nimma"]},
     {t:"build", kn:"nimma hesaru eenu?", en:"What is your name?"},
     {t:"build", kn:"ivaru nanna tande.", en:"He is my father."},
     {t:"build", kn:"adu namma kaaleeju.", en:"That is our college."}
@@ -487,20 +518,20 @@ var UNITS = [
     {t:"fill", s:"___ mangaLavaara.", en:"Today is Tuesday.", a:"ivattu", o:["ivattu","nenne","illi"]},
     {t:"fill", s:"ivattu soomavaara. ___ mangaLavaara.", en:"Today is Monday. Tomorrow is Tuesday.", a:"naaLe", o:["naaLe","nenne","alli"]},
     {t:"fill", s:"___ kaaleejige raje ittu.", en:"Yesterday was a college holiday.", a:"nenne", o:["nenne","naaLe","ivattu"]},
-    {t:"type", q:"doDDa", a:["doDDadu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
-    {t:"type", q:"cikka", a:["cikkadu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
-    {t:"type", q:"nimma", a:["nimmadu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
-    {t:"type", q:"avara", a:["avaradu"], rule:"Make “the … one”", model:["saNNa","saNNadu"]},
-    {t:"type", q:"uuru", a:["uuralli"], rule:"Say “in / at”", model:["mane","maneyalli"]},
-    {t:"type", q:"kaaleeju", a:["kaaleejalli"], rule:"Say “in / at”", model:["mane","maneyalli"]},
-    {t:"type", q:"hoTel", a:["hoTelalli"], rule:"Say “in / at”", model:["mane","maneyalli"]},
-    {t:"type", q:"maisuuru", a:["maisuuralli"], rule:"Say “in / at”", model:["bengaLuuru","bengaLuuralli"]},
-    {t:"type", q:"mane", a:["manege"], rule:"Say “to / for”", model:["uuru","uurige"]},
-    {t:"type", q:"uuTa", a:["uuTakke"], rule:"Say “to / for”", model:["uuru","uurige"]},
-    {t:"type", q:"kelasa", a:["kelasakke"], rule:"Say “to / for”", model:["uuru","uurige"]},
-    {t:"type", q:"avaru", a:["avarige"], rule:"Say “to / for”", model:["uuru","uurige"]},
-    {t:"type", q:"niivu", a:["nimage"], rule:"Say “to / for”", model:["uuru","uurige"]},
-    {t:"type", q:"naavu", a:["namage"], rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"doDDa", a:["doDDadu"], en:"the big one", rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"cikka", a:["cikkadu"], en:"the small one", rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"nimma", a:["nimmadu"], en:"yours", rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"avara", a:["avaradu"], en:"theirs", rule:"Make “the … one”", model:["saNNa","saNNadu"]},
+    {t:"type", q:"uuru", a:["uuralli"], en:"in the town", rule:"Say “in / at”", model:["mane","maneyalli"]},
+    {t:"type", q:"kaaleeju", a:["kaaleejalli"], en:"in the college", rule:"Say “in / at”", model:["mane","maneyalli"]},
+    {t:"type", q:"hoTel", a:["hoTelalli"], en:"in the hotel", rule:"Say “in / at”", model:["mane","maneyalli"]},
+    {t:"type", q:"maisuuru", a:["maisuuralli"], en:"in Mysuru", rule:"Say “in / at”", model:["bengaLuuru","bengaLuuralli"]},
+    {t:"type", q:"mane", a:["manege"], en:"to the house / home", rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"uuTa", a:["uuTakke"], en:"for the meal", rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"kelasa", a:["kelasakke"], en:"to work", rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"avaru", a:["avarige"], en:"to them", rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"niivu", a:["nimage"], en:"to you / for you", rule:"Say “to / for”", model:["uuru","uurige"]},
+    {t:"type", q:"naavu", a:["namage"], en:"to us / for us", rule:"Say “to / for”", model:["uuru","uurige"]},
     {t:"build", kn:"idu eenu?", en:"What is this?"},
     {t:"build", kn:"avaru nimma sneehitaraa?", en:"Are they your friends?"},
     {t:"build", kn:"hampi ondu sundara nagara.", en:"Hampi is a beautiful city."},
@@ -610,15 +641,15 @@ var UNITS = [
     {t:"fill", s:"ivattu namage ___ ide.", en:"Today we have an exam.", a:"pariikShe", o:["pariikShe","granthaalaya","raste"]},
     {t:"fill", s:"granthaalaya ___?", en:"Where is the library?", a:"ellide", o:["ellide","iru","beeDa"]},
     {t:"fill", s:"niinu granthaalayadalli ___.", en:"You stay in the library.", a:"iru", o:["iru","iralla","ellide"]},
-    {t:"type", q:"baru", a:["baruttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
-    {t:"type", q:"hoogu", a:["hooguttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
-    {t:"type", q:"tinnu", a:["tinnuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
-    {t:"type", q:"keeLu", a:["keeLuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
-    {t:"type", q:"nooDu", a:["nooDuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
-    {t:"type", q:"aaDu", a:["aaDuttaane"], rule:"Say “he …s”", model:["iru","iruttaane"]},
-    {t:"type", q:"baru", a:["baruttaare"], rule:"Say “they …”", model:["iru","iruttaare"]},
-    {t:"type", q:"hoogu", a:["hooguttaare"], rule:"Say “they …”", model:["iru","iruttaare"]},
-    {t:"type", q:"koDu", a:["koDuttaare"], rule:"Say “they …”", model:["iru","iruttaare"]},
+    {t:"type", q:"baru", a:["baruttaane"], en:"he comes", rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"hoogu", a:["hooguttaane"], en:"he goes", rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"tinnu", a:["tinnuttaane"], en:"he eats", rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"keeLu", a:["keeLuttaane"], en:"he listens", rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"nooDu", a:["nooDuttaane"], en:"he sees", rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"aaDu", a:["aaDuttaane"], en:"he plays", rule:"Say “he …s”", model:["iru","iruttaane"]},
+    {t:"type", q:"baru", a:["baruttaare"], en:"they come", rule:"Say “they …”", model:["iru","iruttaare"]},
+    {t:"type", q:"hoogu", a:["hooguttaare"], en:"they go", rule:"Say “they …”", model:["iru","iruttaare"]},
+    {t:"type", q:"koDu", a:["koDuttaare"], en:"they give", rule:"Say “they …”", model:["iru","iruttaare"]},
     {t:"build", kn:"kaaleejige baruttiyaa?", en:"Are you coming to college?"},
     {t:"build", kn:"angaDiyalli ella vastugaLu siguttadeyaa?", en:"Is everything available at the shop?"},
     {t:"build", kn:"indu aaTagaLu iralla.", en:"There are no games today."},
@@ -649,9 +680,10 @@ function el(html) { var t = document.createElement("template"); t.innerHTML = ht
 function icon(id) { return '<svg aria-hidden="true"><use href="#' + id + '"/></svg>'; }
 
 /* ---------------- state & streak ---------------- */
-function freshState() { return { streak: 0, best: 0, lastDay: null, met: {}, xp: {}, xpTotal: 0, goal: 20, units: {}, answered: 0, correct: 0 }; }
+function freshState() { return { streak: 0, best: 0, lastDay: null, met: {}, xp: {}, xpTotal: 0, goal: 20, units: {}, answered: 0, correct: 0, remind: { on: false, times: ["09:00", "14:00", "20:00"], day: null, sent: [] } }; }
 var S = freshState();
 try { var raw = localStorage.getItem(STORE_KEY); if (raw) { var parsed = JSON.parse(raw); for (var k in parsed) S[k] = parsed[k]; } } catch (e) { /* storage unavailable: run without saving */ }
+if (!S.remind || !S.remind.times) S.remind = freshState().remind;
 function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } }
 
 function liveStreak() {
@@ -772,6 +804,7 @@ function renderLearn() {
           '<div class="stat"><div class="v">' + wordsSeen() + '</div><div class="label">Words met</div></div>' +
         "</div>" +
       "</div>" +
+      remindHTML() +
       '<div class="track-head"><div><div class="label">Course · 7 units</div><h2>Your path</h2></div>' +
         '<div class="cta-row">' +
           (nu ? '<button class="btn" id="startNext">' + (S.units[nu.id] ? "Continue" : "Start") + " unit " + (UNITS.indexOf(nu) + 1) + "</button>" : "") +
@@ -781,6 +814,7 @@ function renderLearn() {
     "</section>";
 
   $("#goalSel").addEventListener("change", function (e) { S.goal = +e.target.value; save(); checkGoal(); renderLearn(); });
+  bindRemind();
   app.querySelectorAll("[data-unit]").forEach(function (b) { b.addEventListener("click", function () { renderUnit(b.dataset.unit); }); });
   if (nu) $("#startNext").addEventListener("click", function () { startSession([nu], nu.id); });
   $("#reviewBtn").addEventListener("click", function () {
@@ -788,6 +822,117 @@ function renderLearn() {
     if (done.length) startSession(done, null);
   });
 }
+
+/* ---------------- STREAK REMINDERS ----------------
+   Up to 3 reminders a day, only while today's goal is not reached.
+   Desktop notifications when the browser allows them; otherwise a banner
+   in the page plus a flashing tab title. Works while the page is open
+   (a background tab is fine) — a closed page cannot run any code. */
+function notifSupport() { try { return "Notification" in window ? Notification.permission : "unsupported"; } catch (e) { return "unsupported"; } }
+function slotMins(t) { var p = String(t).split(":"); return (+p[0]) * 60 + (+p[1] || 0); }
+function nowMins() { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+function fmtTime(t) { var m = slotMins(t), h = Math.floor(m / 60), mm = m % 60; return ((h + 11) % 12 + 1) + ":" + pad(mm) + (h < 12 ? " am" : " pm"); }
+function rollRemindDay() { var t = dayKey(); if (S.remind.day !== t) { S.remind.day = t; S.remind.sent = []; save(); } }
+/* mark slots that are already in the past as sent, so switching on at 4 pm doesn't fire the 9 am and 2 pm ones */
+function skipPastSlots() {
+  rollRemindDay();
+  var m = nowMins();
+  S.remind.times.forEach(function (t, i) { if (m >= slotMins(t) && S.remind.sent.indexOf(i) < 0) S.remind.sent.push(i); });
+  save();
+}
+function reminderText() {
+  var st = liveStreak(), left = Math.max(0, S.goal - todayXP());
+  return st > 0
+    ? "Your " + st + "-day streak ends at midnight. " + left + " XP to go \u2014 one short session keeps it."
+    : "You haven't practised today. Earn " + left + " XP to start a streak.";
+}
+var baseTitle = document.title, titleTimer = null;
+function flashTitle() {
+  if (titleTimer) return;
+  var on = false;
+  titleTimer = setInterval(function () { on = !on; document.title = on ? "\u25cf Streak at risk" : baseTitle; }, 1200);
+}
+function stopFlash() { if (titleTimer) { clearInterval(titleTimer); titleTimer = null; } document.title = baseTitle; }
+function showBanner(text) { $("#bannerText").textContent = text; $("#banner").hidden = false; }
+function hideBanner() { $("#banner").hidden = true; }
+function fireReminder(test) {
+  var text = test ? "Test reminder. " + reminderText() : reminderText();
+  if (notifSupport() === "granted" && (document.hidden || test)) {
+    try {
+      var n = new Notification("baLake kannaDa", { body: text, tag: "balake-streak" });
+      n.onclick = function () { try { window.focus(); } catch (e) { /* ignore */ } n.close(); };
+    } catch (e) { /* some browsers only allow notifications from a service worker */ }
+  }
+  showBanner(text);
+  if (document.hidden) flashTitle();
+}
+function remindTick() {
+  if (!S.remind.on) return;
+  rollRemindDay();
+  if (goalMetToday()) { hideBanner(); stopFlash(); return; }
+  var m = nowMins(), due = [];
+  S.remind.times.forEach(function (t, i) { if (m >= slotMins(t) && S.remind.sent.indexOf(i) < 0) due.push(i); });
+  if (!due.length) return;
+  S.remind.sent = S.remind.sent.concat(due);   // several missed slots = one reminder, not a burst
+  save();
+  fireReminder(false);
+}
+function askPermission(done) {
+  if (notifSupport() !== "default") { done(); return; }
+  try {
+    var p = Notification.requestPermission(function () { done(); });
+    if (p && p.then) p.then(function () { done(); }, function () { done(); });
+  } catch (e) { done(); }
+}
+function remindStatus() {
+  if (!S.remind.on) return "Up to 3 nudges a day, only on days you haven't reached your goal yet.";
+  var perm = notifSupport(), msg;
+  if (perm === "granted") msg = "On. You'll get a desktop notification at these times while this page is open \u2014 a background tab is fine.";
+  else if (perm === "default") msg = "On. Click \u201cAllow\u201d when your browser asks, to get desktop notifications.";
+  else msg = "On, inside the page only: this browser blocked desktop notifications here, so a banner and a flashing tab title remind you instead. Keep the page open in a tab.";
+  if (goalMetToday()) msg += " Today's goal is done, so no more reminders today.";
+  return msg;
+}
+function remindHTML() {
+  var on = S.remind.on;
+  var slots = S.remind.times.map(function (t, i) {
+    var sent = S.remind.day === dayKey() && S.remind.sent.indexOf(i) >= 0;
+    return '<label class="rslot"><span class="label">Reminder ' + (i + 1) + (on && sent ? " \u00b7 passed" : "") + '</span><input type="time" id="rt' + i + '" value="' + esc(t) + '"' + (on ? "" : " disabled") + "></label>";
+  }).join("");
+  return '<div class="panel remind">' +
+    '<div class="remind-head"><div style="display:grid;gap:4px;min-width:0"><h3>Streak reminders</h3><p class="muted" id="remindStatus">' + esc(remindStatus()) + "</p></div>" +
+      '<button class="btn small' + (on ? " ghost" : "") + '" id="remindToggle" aria-pressed="' + on + '">' + (on ? "Turn off" : "Turn on") + "</button></div>" +
+    '<div class="remind-times">' + slots + "</div>" +
+    (on ? '<div><button class="btn ghost small" id="remindTest">Send a test reminder</button></div>' : "") +
+  "</div>";
+}
+function bindRemind() {
+  $("#remindToggle").addEventListener("click", function () {
+    S.remind.on = !S.remind.on;
+    if (S.remind.on) { skipPastSlots(); askPermission(function () { if ($("#remindToggle")) renderLearn(); }); } else { hideBanner(); stopFlash(); }
+    save(); renderLearn();
+  });
+  S.remind.times.forEach(function (t, i) {
+    $("#rt" + i).addEventListener("change", function (e) {
+      if (!e.target.value) return;
+      S.remind.times[i] = e.target.value;
+      rollRemindDay();
+      var idx = S.remind.sent.indexOf(i);
+      if (idx >= 0) S.remind.sent.splice(idx, 1);
+      if (nowMins() >= slotMins(e.target.value)) S.remind.sent.push(i);   // a time already past today starts tomorrow
+      save();
+    });
+  });
+  var test = $("#remindTest");
+  if (test) test.addEventListener("click", function () { askPermission(function () { fireReminder(true); $("#remindStatus").textContent = remindStatus(); }); });
+}
+$("#bannerX").addEventListener("click", hideBanner);
+$("#bannerGo").addEventListener("click", function () {
+  hideBanner();
+  if (SESSION) return;
+  var nu = nextUnit(), done = UNITS.filter(function (u) { return S.units[u.id]; });
+  if (nu) startSession([nu], nu.id); else if (done.length) startSession(done, null);
+});
 
 /* ---------------- UNIT DETAIL ---------------- */
 function renderUnit(id) {
@@ -883,8 +1028,10 @@ function renderQuestion() {
     fb.className = "feedback " + (r.ok ? "ok" : "bad");
     var title = r.ok ? (r.almost ? "Correct — mind the capitals" : pickPraise()) : "Not quite";
     $("#fbText").innerHTML = '<div class="fb-title">' + title + "</div>" +
-      (r.ok && !r.almost ? (r.extra ? '<div class="fb-ans">' + r.extra + "</div>" : "") :
-        '<div class="fb-ans">' + (r.ok ? "Exact spelling: " : "Correct answer: ") + r.answer + "</div>");
+      (r.answer ? '<div class="fb-ans">' + (r.ok ? (r.almost ? "Exact spelling: " : "") : "Correct answer: ") + r.answer + "</div>" : "") +
+      (r.en ? '<div class="fb-en"><span class="fb-k">English</span>' + esc(r.en) + "</div>" : "") +
+      (!r.ok && r.yours ? '<div class="fb-en fb-yours"><span class="fb-k">' + (r.yoursLabel || "You chose") + "</span>" + r.yours + "</div>" : "") +
+      (r.list ? '<div class="fb-list">' + r.list + "</div>" : "");
     checkBtn.textContent = "Continue";
     checkBtn.disabled = false;
     checkBtn.className = "btn " + (r.ok ? "okb" : "badb");
@@ -959,6 +1106,15 @@ var STOP = { the:1, of:1, to:1, for:1, a:1, an:1, is:1, are:1, there:1, when:1, 
 function glossWords(en) { return en.toLowerCase().split(/[^a-z]+/).filter(function (w) { return w && !STOP[w]; }); }
 function overlaps(a, b) { var wa = glossWords(a); return glossWords(b).some(function (w) { return wa.indexOf(w) >= 0; }); }
 
+/* English gloss for any Kannada word in the course, e.g. glossOf("mane") -> "house" */
+var GLOSS = {};
+UNITS.forEach(function (u) { u.vocab.forEach(function (v) {
+  v[0].split(" / ").forEach(function (k) { if (!GLOSS[k]) GLOSS[k] = v[1]; });
+  if (!GLOSS[v[0]]) GLOSS[v[0]] = v[1];
+}); });
+function glossOf(kn) { return GLOSS[kn] || GLOSS[kn.replace(/[?.!]+$/, "")] || ""; }
+function knWithGloss(kn) { var g = glossOf(kn); return knHTML(kn) + (g ? ' <span class="muted">= ' + esc(g) + "</span>" : ""); }
+
 function norm(s) { return s.trim().replace(/\s+/g, " ").replace(/[?.!,]+$/, ""); }
 
 var RENDER = {
@@ -976,7 +1132,7 @@ var RENDER = {
       check: function () {
         var v = cl.get(); cl.mark(it.a);
         var full = it.s.replace("___", it.a);
-        return { ok: v === it.a, answer: knHTML(full), extra: knHTML(full) };
+        return { ok: v === it.a, answer: knHTML(full), en: it.en.replace(/\s+\(from:.*\)$/, ""), yours: knWithGloss(v) };
       }
     };
   },
@@ -986,7 +1142,8 @@ var RENDER = {
     var others = uniq(q.pool.filter(function (w) { return w.kn !== q.w.kn && !overlaps(w.en, q.w.en); }).map(function (w) { return w.en; }));
     var opts = shuffle([q.w.en].concat(pick(others, 3)));
     var cl = choiceList(body, opts, false, onReady);
-    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(q.w.en); return { ok: v === q.w.en, answer: esc(q.w.en) }; } };
+    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(q.w.en); var wrongKn = q.pool.filter(function (w) { return w.en === v; })[0];
+      return { ok: v === q.w.en, answer: knHTML(q.w.kn), en: q.w.en, yours: "\u201c" + esc(v) + "\u201d" + (wrongKn ? ' <span class="muted">= </span>' + knHTML(wrongKn.kn) : "") }; } };
   },
 
   toKn: function (q, body, onReady) {
@@ -994,7 +1151,7 @@ var RENDER = {
     var others = uniq(q.pool.filter(function (w) { return w.kn !== q.w.kn && !overlaps(w.en, q.w.en); }).map(function (w) { return w.kn; }));
     var opts = shuffle([q.w.kn].concat(pick(others, 3)));
     var cl = choiceList(body, opts, true, onReady);
-    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(q.w.kn); return { ok: v === q.w.kn, answer: knHTML(q.w.kn) }; } };
+    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(q.w.kn); return { ok: v === q.w.kn, answer: knHTML(q.w.kn), en: q.w.en, yours: knWithGloss(v) }; } };
   },
 
   pair: function (q, body, onReady) {
@@ -1005,7 +1162,7 @@ var RENDER = {
     var prompt = it.kind === "opp" ? "What is the opposite of " : "What is the male form of ";
     body.appendChild(el('<div class="prompt">' + prompt + knHTML(it.a) + '<span class="muted" style="font-size:16px">' + gloss(it.a) + "</span>?</div>"));
     var cl = choiceList(body, opts, true, onReady);
-    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(it.b); return { ok: v === it.b, answer: knHTML(it.a) + " ↔ " + knHTML(it.b) + gloss(it.b) }; } };
+    return { key: cl.key, check: function () { var v = cl.get(); cl.mark(it.b); return { ok: v === it.b, answer: knHTML(it.a) + " \u2194 " + knHTML(it.b), en: (glossOf(it.a) || it.a) + " \u2194 " + (glossOf(it.b) || it.b), yours: knWithGloss(v) }; } };
   },
 
   type: function (q, body, onReady) {
@@ -1023,7 +1180,9 @@ var RENDER = {
         inp.disabled = true;
         var exact = it.a.some(function (a) { return a === v; });
         var loose = !exact && it.a.some(function (a) { return a.toLowerCase() === v.toLowerCase(); });
-        return { ok: exact || loose, almost: loose, answer: knHTML(it.a[0]) };
+        var qg = glossOf(it.q);
+        return { ok: exact || loose, almost: loose, answer: knHTML(it.q) + ' <span class="muted">\u2192</span> ' + knHTML(it.a[0]),
+          en: (qg ? qg + " \u2192 " : "") + it.en, yours: v ? knHTML(v) : "", yoursLabel: "You typed" };
       }
     };
   },
@@ -1058,7 +1217,7 @@ var RENDER = {
       check: function () {
         [].forEach.call(body.querySelectorAll(".tile"), function (t) { t.disabled = true; });
         var got = placed.map(function (p) { return p.w; }).join(" ");
-        return { ok: got === target.join(" "), answer: knHTML(it.kn) };
+        return { ok: got === target.join(" "), answer: knHTML(it.kn), en: it.en, yours: got ? knHTML(got) : "(nothing)", yoursLabel: "You built" };
       }
     };
   },
@@ -1084,7 +1243,8 @@ var RENDER = {
           if (selL.dataset.kn === selR.dataset.kn) {
             [selL, selR].forEach(function (x) { x.classList.remove("sel"); x.classList.add("done"); x.disabled = true; });
             matched++;
-            if (matched === pairs.length && finish) finish({ ok: true, extra: errs ? errs + " wrong tap" + (errs > 1 ? "s" : "") + " along the way." : "All pairs matched first time." });
+            if (matched === pairs.length && finish) finish({ ok: true, list: pairs.map(function (w) { return "<span>" + knHTML(w.kn) + ' <span class="muted">= ' + esc(w.en) + "</span></span>"; }).join("") +
+              '<span class="muted">' + (errs ? errs + " wrong tap" + (errs > 1 ? "s" : "") + " along the way." : "All pairs matched first time.") + "</span>" });
           } else {
             errs++;
             var a = selL, c = selR;
@@ -1113,6 +1273,7 @@ function renderResult() {
   var xp = 10 + s.firstTry;
   var before = liveStreak();
   var hitGoal = addXP(xp);
+  if (goalMetToday()) { hideBanner(); stopFlash(); }
   if (s.unitId) { S.units[s.unitId] = (S.units[s.unitId] || 0) + 1; save(); }
   var acc = Math.round(s.firstTry / s.total * 100);
   var st = liveStreak();
@@ -1211,7 +1372,12 @@ try { var hashTab = (location.hash || "").replace("#", ""); var saved = localSto
 if (["learn", "words", "guide"].indexOf(startTab) < 0) startTab = "learn";
 setTab(startTab);
 // Refresh the streak display if the day rolls over while the page is open
-document.addEventListener("visibilitychange", function () { if (!document.hidden && !SESSION) renderHeader(); });
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) { stopFlash(); if (!SESSION) renderHeader(); }
+  remindTick();
+});
+remindTick();
+setInterval(remindTick, 30000);
 })();
 </script>
 </body>
